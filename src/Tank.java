@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
@@ -14,6 +15,7 @@ public class Tank {
 	char id = ' ';
 	int team;
 	int shootTimer;
+	Color color;
 	
 	public Tank(int x, int y, char id, int team ) {
 		direction = Direction.UP;
@@ -25,13 +27,16 @@ public class Tank {
 		this.team = team;
 	}
 	
-	public void paintComponent(Graphics2D g2d) {
+	
+	public void paintComponent(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(Color.RED);
 		// Rectangle2D doesnt have an int version. why...
 		g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 	}
 	
 	public void move() {
+		
 		double x = rect.getX();
 		double y = rect.getY();
 		double w = rect.getWidth();
@@ -45,7 +50,7 @@ public class Tank {
 		
 		switch (direction) {
 			case UP:
-				rect.setRect(x, y-speed, w, h);
+				rect.setFrame(x, y-speed, w, h);
 				break;
 			case DOWN:
 				rect.setRect(x, y+speed, w, h);
@@ -60,5 +65,13 @@ public class Tank {
 				break;
 		}
 	}
+	
+	public void setDirection(Direction direction) {
+		this.direction = direction;
+	}
 		
+	
+	
+	
+	
 }
