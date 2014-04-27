@@ -14,36 +14,24 @@ import java.util.concurrent.BlockingQueue;
 public class GameServer {
 
 	private static final int PORT = 5500;
-	 	
-	 	private static final int MESSAGE_QUEUE_MAX = 500; //as a tentative start
-	 	private BlockingQueue<String> messages;
-	 
-	 	ArrayList<PlayerThread> players;
-	  	ServerSocket listener;
-	  	
-	 
-	  	public GameServer() {
-	 		players = new ArrayList<PlayerThread>();
-	 		messages = new ArrayBlockingQueue<String>(MESSAGE_QUEUE_MAX);
-	  	}
-	 
-	 	public void listen() throws IOException {
-	  		listener = new ServerSocket(PORT);
-	  		try {
-	 			while (true) {
-	 				new PlayerThread(listener.accept()).start();
-	  			}
-	  		} finally {
-	  			listener.close();
-	  		}
-	  	}
-	 
-	 	public void addPlayer(PlayerThread player) {
-	 		synchronized(player){
-	 			players.add(player);
-	 		}
-	 
-	 	}
+
+	private static final int MESSAGE_QUEUE_MAX = 500; //as a tentative start
+	private BlockingQueue<String> messages;
+
+	ArrayList<PlayerThread> players;
+
+	ServerSocket listener;
+	
+
+	public GameServer() {}
+
+
+	public void addPlayer(PlayerThread player) {
+		synchronized(player){
+			players.add(player);
+		}
+
+	}
 
 	class PlayerThread extends Thread {
 

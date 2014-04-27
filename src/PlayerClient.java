@@ -2,6 +2,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,24 +18,44 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	
 
-	private Tank tank;
+	private ArrayList<Tank> tanks;
+	private Tank selected;
 	boolean shouldMove;
 	boolean isRunning; // used for gameloop
 	private Timer timer;
+	Direction direction; // the direction to move in
+	Direction previousDirection;
+	HashMap<Integer, Direction> hm;
+	
 	
 	public PlayerClient() {
-		tank = new Tank(50,50,'1',1);
+		hm = new HashMap<>();
+		tanks = new ArrayList<Tank>();
+		tanks.add(new Tank(50,50,'Q',1));
+		tanks.add(new Tank(100,100,'W',1));
+		tanks.add(new Tank(200,200,'E',1));
+		selected = tanks.get(0);
 		addKeyListener(this);
 		setFocusable(true);
+		setupHashMap();
 		//shouldMove = true;
 		gameLoop();
 		
 	}
 	
+	public void setupHashMap() {
+		hm.put(38, Direction.UP);
+		hm.put(40, Direction.DOWN);
+		hm.put(37, Direction.LEFT);
+		hm.put(39, Direction.RIGHT);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		//Graphics2D g2d = (Graphics2D) g;
-		tank.paintComponent(g);
+		for (Tank t : tanks) {
+			t.paintComponent(g);
+		}
 	}
 	
 	
@@ -53,7 +75,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	public void updateLogic() {
 		if (shouldMove) {
-			tank.move();
+			if (selected != null) {
+				selected.move();
+			}
 			repaint();
 		}
 	}
@@ -74,44 +98,57 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		//if (shouldMove) {
+		//System.out.println(e.getKeyCode());
+		
+		if (e.getKeyCode() == 81) { // Q
+			if (selected == tanks.get(0))
+				selected = null;
+			else
+				selected = tanks.get(0);
+		}
+		if (e.getKeyCode() == 87) { // W
+			if (selected == tanks.get(1))
+				selected = null;
+			else
+				selected = tanks.get(1);
+		}
+		if (e.getKeyCode() == 69) { // E
+			if (selected == tanks.get(2))
+				selected = null;
+			else
+				selected = tanks.get(2);
+		}
+		if (selected != null) {
 			if(e.getKeyCode() == 38) {
-				tank.setDirection(Direction.UP);
-				shouldMove = true;
-				//repaint();
+				selected.setDirection(Direction.UP);
+				shouldMove = true;				
 			}
 			if(e.getKeyCode() == 39) {
-				tank.setDirection(Direction.RIGHT);
-				shouldMove = true;
-				//tank.move();
-			//	repaint();
+				selected.setDirection(Direction.RIGHT);
+				shouldMove = true;				
 			}
 			if(e.getKeyCode() == 40) {
-				tank.setDirection(Direction.DOWN);
-				shouldMove = true;
-				//tank.move();
-			//	repaint();
+				selected.setDirection(Direction.DOWN);
+				shouldMove = true;				
 			}
 			if(e.getKeyCode() == 37) {
-				tank.setDirection(Direction.LEFT);
+				selected.setDirection(Direction.LEFT);
 				shouldMove = true;
-				//tank.move();
-				//repaint();
 			}
-		//}
-		
+			previousDirection = selected.getDirection();
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		shouldMove = false;
+		if (hm.get(e.getKeyCode()) == previousDirection) { //allows for smooth directional changes
+			shouldMove = false;
+		}
+		
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyTyped(KeyEvent e) {}
 	
 	private static final long serialVersionUID = 1L;
 }
