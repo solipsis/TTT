@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -37,20 +38,38 @@ public class PlayerClient extends JComponent implements KeyListener {
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
-		tanks.add(new Tank("Q",1, 435, 330));
-		tanks.add(new Tank("W",1, 435, 390));
-		tanks.add(new Tank("E",1, 435, 450));
-		selected = tanks.get(0);
-		selected.setSelected(true);
-		enemyTanks.add(new Tank("Q", 2, 300, 300));
+		initializeTanks();
+		
 		addKeyListener(this);
 		setFocusable(true);
 		map = new Map();
 		
+		
+		//ArrayList<Tank> temp = tanks;
+		//tanks = enemyTanks;
+		//enemyTanks = temp;
+		
 		setupHashMap();
-		//shouldMove = true;
+		
 		gameLoop();
 		
+	}
+	
+	public void initializeTanks() {
+		tanks.add(new Tank("Q",1, 435, 330));
+		tanks.add(new Tank("W",1, 435, 390));
+		tanks.add(new Tank("E",1, 435, 450));
+		enemyTanks.add(new Tank("Q", 2,800, 600));
+		enemyTanks.add(new Tank("W", 2, 525, 390));
+		enemyTanks.add(new Tank("E", 2, 525, 450));
+		for (Tank t: tanks) {
+			t.setColor(Color.magenta);
+		}
+		for (Tank t: enemyTanks) {
+			t.setColor(Color.red);
+		}
+		selected = tanks.get(0);
+		selected.setSelected(true);
 	}
 	
 	public void setupHashMap() {
@@ -101,8 +120,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				if (wallCollision()) {
 					selected.setRect(oldRect);
 				}
-				flagCollision();
-				
+				flagCollision();	
 			}
 			repaint();
 		}
@@ -127,15 +145,14 @@ public class PlayerClient extends JComponent implements KeyListener {
 				if (selected.team == f.team) {
 					if (selected.isHasFlag()) {
 						score();
-						f.score();
-						
+						map.flags.get(0).score();
+						map.flags.get(1).score();
 					}
 				}
 				else {
+					f.pickedUp = true;
 					selected.setHasFlag(true);
-				}
-				
-				
+				}				
 			}
 		}
 	}
@@ -192,6 +209,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 			for (Tank e : enemyTanks) {
 				for (Bullet b : e.bullets) {
 					if (rect.intersects(b.getRect())) {
+						if (t.isHasFlag()) {
+							// take proper action if dead tank was carrying flag
+							if (t.team == 1) {
+								map.flags.get(1).drop();
+							}
+							else {
+								map.flags.get(0).drop();
+							}
+						}
 						t.die();
 					}
 				}
@@ -204,7 +230,6 @@ public class PlayerClient extends JComponent implements KeyListener {
 	}
 	
 	
-	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		//System.out.println(e.getKeyCode());
@@ -212,7 +237,6 @@ public class PlayerClient extends JComponent implements KeyListener {
 		if (e.getKeyCode() == 81) { // Q
 			handleSelection(0);
 		}
-		
 		if (e.getKeyCode() == 87) { // W
 			handleSelection(1);
 		}

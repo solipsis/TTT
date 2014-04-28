@@ -26,11 +26,14 @@ public class Map {
 		Graphics2D g2d = (Graphics2D) g;
 		drawGrid(g2d);
 		//drawRects(g2d, spawnZones, Color.YELLOW);
+		for (Flag f : flags) {
+			f.paintComponent(g2d);
+		}
 		for (SpawnZone s : spawn) {
 			s.paintComponent(g2d);
 		}
 		drawRects(g2d, walls, Color.GREEN);
-		drawRects(g2d, flagSpawns, Color.CYAN);
+		//drawRects(g2d, flagSpawns, Color.CYAN);
 		
 	}
 	

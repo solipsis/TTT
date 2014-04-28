@@ -37,7 +37,6 @@ public class Tank {
 		shootTimer = 30;
 		this.id = id;
 		this.team = team;
-		color = Color.PINK;
 	}
 	
 	
@@ -162,6 +161,7 @@ public class Tank {
 	public void die() {
 		dead = true;
 		deathTimer = 500;
+		hasFlag = false;
 		rect = new Rectangle2D.Double(spawnX, spawnY, size, size);
 	}
 	
@@ -201,6 +201,16 @@ public class Tank {
 
 	public void setHasFlag(boolean hasFlag) {
 		this.hasFlag = hasFlag;
+	}
+
+
+	public Color getColor() {
+		return color;
+	}
+
+
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 
