@@ -98,6 +98,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 		for (Tank t : tanks) {
 			t.gameTick();
 		}
+		for (Tank t : enemyTanks) {
+			t.gameTick();
+		}
 		checkForHitByEnemy();
 	}
 	
@@ -118,7 +121,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 			for (Tank e : enemyTanks) {
 				for (Bullet b : e.bullets) {
 					if (rect.intersects(b.getRect())) {
-						
+						t.die();
 					}
 				}
 			}
@@ -144,8 +147,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 		//System.out.println(e.getKeyCode());
 		
 		if (e.getKeyCode() == 81) { // Q
+			selected.setSelected(false);
 			if (selected == tanks.get(0)) {
-				selected.setSelected(false);
 				selected = null;
 			}
 			else {
@@ -155,8 +158,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 		}
 		
 		if (e.getKeyCode() == 87) { // W
+			selected.setSelected(false);
 			if (selected == tanks.get(1)) {
-				selected.setSelected(false);
 				selected = null;
 			}
 			else {
@@ -165,8 +168,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 			}
 		}
 		if (e.getKeyCode() == 69) { // E
+			selected.setSelected(false);
 			if (selected == tanks.get(2)) {
-				selected.setSelected(false);
 				selected = null;
 			}
 			else {

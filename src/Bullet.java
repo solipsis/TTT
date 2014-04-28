@@ -4,7 +4,7 @@ import java.awt.geom.Rectangle2D;
 
 
 public class Bullet {
-	final int speed = 5;
+	final int speed = 6;
 	final int size = 20;
 	private Direction direction;
 	private Rectangle2D rect;

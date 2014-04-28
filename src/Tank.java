@@ -1,3 +1,4 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -9,7 +10,7 @@ public class Tank {
 	
 	private boolean isSelected;
 	private boolean hasFlag;
-	final int speed = 5;
+	final int speed = 3;
 	final int size = 40;
 	private Direction direction;
 	private Rectangle2D rect;
@@ -25,20 +26,33 @@ public class Tank {
 		rect = new Rectangle2D.Double(x, y, size, size);
 		isSelected = false;
 		hasFlag = false;
-		shootTimer = 50;
+		shootTimer = 30;
 		this.id = id;
 		this.team = team;
+		color = Color.RED;
 	}
 	
 	
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(Color.RED);
+		g2d.setColor(color);
 		// Rectangle2D doesnt have an int version. why...
 		g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 		for(Bullet b : bullets) {
 			b.paintComponent(g2d);
 		}
+		g2d.setColor(Color.BLACK);
+		g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		
+		//highlight the selected tank
+		if (isSelected) {
+			g2d.setColor(Color.BLUE);
+			g2d.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		}
+		g2d.drawRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
+		
+		drawCannon(g2d);
+		
 	}
 	
 	public void gameTick() {
@@ -46,7 +60,7 @@ public class Tank {
 			shootTimer--;
 			if (shootTimer == 0) {
 				shootBullet();
-				shootTimer = 50;
+				shootTimer = 30;
 			}
 		}
 		else {
@@ -55,6 +69,33 @@ public class Tank {
 		for (Bullet b : bullets) {
 			b.move();
 		}
+		
+	}
+	
+	public void drawCannon(Graphics2D g2d) {
+		g2d.setColor(Color.GREEN);
+		g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		
+		int x = (int)rect.getX();
+		int y = (int)rect.getY();
+		
+		switch (direction) {
+		case UP:
+			g2d.drawLine(x + 10, y, x + 30, y);
+			break;
+		case DOWN:
+			g2d.drawLine(x + 10, y+size, x + 30, y+size);
+			break;
+		case LEFT:
+			g2d.drawLine(x, y + 10, x, y + 30);
+			break;
+		case RIGHT:
+			g2d.drawLine(x + size, y + 10, x + size, y + 30);
+			break;
+		default:
+			break;
+	}
+		//g2d.drawLine(rect.getX() + 10, rect, x2, y2);
 		
 	}
 	
@@ -95,7 +136,7 @@ public class Tank {
 	}
 	
 	public void die() {
-		rect = new Rectangle2D.Double(500,500,20,20);
+		rect = new Rectangle2D.Double(500,500,size,size);
 	}
 	
 	public void setDirection(Direction direction) {
