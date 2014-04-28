@@ -35,9 +35,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 		hm = new HashMap<>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
-		tanks.add(new Tank(50,50,'Q',1));
-		tanks.add(new Tank(100,100,'W',1));
-		tanks.add(new Tank(200,200,'E',1));
+		tanks.add(new Tank(250,200,'Q',1));
+		tanks.add(new Tank(200,200,'W',1));
+		tanks.add(new Tank(200,250,'E',1));
 		selected = tanks.get(0);
 		selected.setSelected(true);
 		enemyTanks.add(new Tank(300,300,'Q', 2));
