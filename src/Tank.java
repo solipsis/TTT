@@ -35,6 +35,24 @@ public class Tank {
 		g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 	}
 	
+	public void gameTick() {
+		if (!isSelected) {
+			shootTimer--;
+			if (shootTimer == 0) {
+				shootBullet();
+				shootTimer = 50;
+			}
+		}
+		else {
+			shootTimer = 50;
+		}
+	}
+	
+	public void shootBullet() {
+		
+	}
+	
+	
 	public void move() {
 		
 		double x = rect.getX();
@@ -69,7 +87,10 @@ public class Tank {
 	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}
-		
+	
+	public Direction getDirection() {
+		return direction;
+	}
 	
 	
 	

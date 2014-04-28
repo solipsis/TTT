@@ -29,7 +29,6 @@ public class Bullet {
 		double w = rect.getWidth();
 		double h = rect.getHeight();
 		
-		// a tank moves slower if it holds the flag
 		switch (direction) {
 			case UP:
 				rect.setRect(x, y-speed, w, h);
