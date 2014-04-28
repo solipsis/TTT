@@ -49,34 +49,57 @@ public class GameServer {
 
 		private Socket socket;
 		private PrintWriter out;
+		private BufferedReader in;
 
 		public PlayerThread(Socket socket) {
 			this.socket = socket;
 		}
 		
-		public void sendToAll(String message){
+		public void sendToAll(String message) throws IOException{
 			for (PlayerThread player : players){
-				out.write(message);
+				if (player.getSocket() != socket){
+					out = new PrintWriter(player.getSocket().getOutputStream());
+					out.write(message);
+					out.println();
+				}
+			}
+		}
+		
+		public Socket getSocket(){
+			return socket;
+		}
+		
+		class MessageBuilder extends Thread {
+			@Override
+			public void run(){
+				try {
+					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					while(true){
+						messages.add(in.readLine());
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
 		@Override
 		public void run() {
+			new MessageBuilder().start();
 
 			try {
-				BufferedReader in;
-				out = new PrintWriter(socket.getOutputStream());
+				
 				while (true){ //need an exit condition
-					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					sendToAll(in.readLine());
+					sendToAll(messages.take());
 				}
 				
 				
 				
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
-
 }
