@@ -21,6 +21,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 
 	private ArrayList<Tank> tanks;
 	private ArrayList<Tank> enemyTanks;
+	private ArrayList<Bullet> toRemove;
 	private Tank selected;
 	boolean shouldMove;
 	boolean isRunning; // used for gameloop
@@ -33,6 +34,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	public PlayerClient() {
 		hm = new HashMap<>();
+		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
 		tanks.add(new Tank(250,200,'Q',1));
@@ -96,11 +98,17 @@ public class PlayerClient extends JComponent implements KeyListener {
 					System.out.println("collision detected");
 					selected.setRect(oldRect);
 				}
+				if (wallCollision()) {
+					selected.setRect(oldRect);
+				}
 			}
 			repaint();
 		}
 		for (Tank t : tanks) {
 			t.gameTick();
+			toRemove.clear();
+			ArrayList<Bullet> toRemove = bulletCollision(t.bullets);
+			t.bullets.removeAll(toRemove);
 		}
 		for (Tank t : enemyTanks) {
 			t.gameTick();
@@ -108,7 +116,23 @@ public class PlayerClient extends JComponent implements KeyListener {
 		checkForHitByEnemy();
 	}
 	
-	// checks to see if 2 tanks collide
+	public ArrayList<Bullet> bulletCollision(ArrayList<Bullet> bullets) {
+		for (Bullet b : bullets) {
+			for (Rectangle2D wall : map.getWalls()) {
+				if (b.getRect().intersects(wall)) {
+					toRemove.add(b);
+				}
+			}
+			for (Rectangle2D spawn : map.getSpawnZones()) {
+				if (b.getRect().intersects(spawn)) {
+					toRemove.add(b);
+				}
+			}
+		}
+		return toRemove;
+	}
+	
+	// checks to see if 2 enemy tanks collide
 	public boolean playerCollision() {
 		for (Tank enemy : enemyTanks) {
 			if (selected.getRect().intersects(enemy.getRect())){
@@ -118,6 +142,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 		return false;
 	}
 	
+	// checks to see if take collides with wall
+	public boolean wallCollision() {
+		for (Rectangle2D wall : map.getWalls()) {
+			if (selected.getRect().intersects(wall)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public void checkForHitByEnemy() {
 		for (Tank t : tanks) {

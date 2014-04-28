@@ -16,16 +16,21 @@ public class Map {
 		addWalls();
 		
 		//addFlags();
-		//addSpawns();
+		addSpawns();
 		//addSafeZones();
 	}
 	
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		drawGrid(g2d);
-		for (Rectangle2D rect : walls) {
-			//System.out.println("walls");
-			g2d.setColor(Color.GREEN);
+		drawRects(g2d, spawnZones, Color.YELLOW);
+		drawRects(g2d, walls, Color.GREEN);
+		
+	}
+	
+	public void drawRects(Graphics2D g2d, ArrayList<Rectangle2D> rects, Color color) {
+		for (Rectangle2D rect : rects) {
+			g2d.setColor(color);
 			g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g2d.setColor(Color.BLACK);
@@ -37,14 +42,14 @@ public class Map {
 		g2d.drawLine(500, 0, 500, 800);
 	}
 	
+	public void addSpawns() {
+		mirrorRect(430, 320, 70, 200, spawnZones);
+	}
+	
 	public void addWalls() {
 		walls.add(new Rectangle2D.Double(0, 100, 1000, 40)); //top bar
 		walls.add(new Rectangle2D.Double(0, 720, 1000, 40)); //bottom bar
-		//walls.add(new Rectangle2D.Double(0, 100, 40, 700));  // left bar
-		//walls.add(new Rectangle2D.Double(960, 100, 40, 700)); //right bar
 		mirrorRect(0, 100, 40, 700, walls);
-		//walls.add(new Rectangle2D.Double(40, 140, 150, 60));
-		//walls.add(new Rectangle2D.Double(810, 140, 150, 60));
 		mirrorRect(40, 140, 150, 60, walls); //top corners
 		mirrorRect(300, 200, 120, 15, walls); //top mid
 		mirrorRect(490, 225, 10, 60, walls); // mid slit
@@ -61,9 +66,42 @@ public class Map {
 		mirrorRect(155, 290, 50, 50, walls); 
 	}
 	
+	// creates 2 rectangles mirrored over the middle
 	public void mirrorRect(int x, int y, int w, int h, ArrayList<Rectangle2D> list) {
 		list.add(new Rectangle2D.Double(x,y,w,h));
 		list.add(new Rectangle2D.Double(1000-w-x, y, w, h));
+	}
+
+	public ArrayList<Rectangle2D> getWalls() {
+		return walls;
+	}
+
+	public void setWalls(ArrayList<Rectangle2D> walls) {
+		this.walls = walls;
+	}
+
+	public ArrayList<Rectangle2D> getFlagSpawns() {
+		return flagSpawns;
+	}
+
+	public void setFlagSpawns(ArrayList<Rectangle2D> flagSpawns) {
+		this.flagSpawns = flagSpawns;
+	}
+
+	public ArrayList<Rectangle2D> getSpawnZones() {
+		return spawnZones;
+	}
+
+	public void setSpawnZones(ArrayList<Rectangle2D> spawnZones) {
+		this.spawnZones = spawnZones;
+	}
+
+	public ArrayList<Rectangle2D> getSafeZones() {
+		return safeZones;
+	}
+
+	public void setSafeZones(ArrayList<Rectangle2D> safeZones) {
+		this.safeZones = safeZones;
 	}
 	
 }
