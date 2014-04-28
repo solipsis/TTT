@@ -1,5 +1,6 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -15,7 +16,7 @@ public class Tank {
 	final int size = 40;
 	private Direction direction;
 	private Rectangle2D rect;
-	char id = ' ';
+	String id = "";
 	int team;
 	int shootTimer;
 	int deathTimer;
@@ -24,7 +25,7 @@ public class Tank {
 	Color color;
 	ArrayList<Bullet> bullets;
 	
-	public Tank(char id, int team, int spawnX, int spawnY ) {
+	public Tank(String id, int team, int spawnX, int spawnY ) {
 		bullets = new ArrayList<Bullet>();
 		this.spawnX = spawnX;
 		this.spawnY = spawnY;
@@ -36,7 +37,7 @@ public class Tank {
 		shootTimer = 30;
 		this.id = id;
 		this.team = team;
-		color = Color.RED;
+		color = Color.PINK;
 	}
 	
 	
@@ -53,7 +54,11 @@ public class Tank {
 			// Rectangle2D doesnt have an int version. why...
 			g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 			g2d.setColor(Color.BLACK);
+			Font textFont = new Font("Arial", Font.BOLD, 20);  
+			g.setFont(textFont); 
+			g2d.drawString(id, (int)rect.getX() + 10, (int)rect.getY() + 30);
 			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			
 		
 			//highlight the selected tank
 			if (isSelected) {

@@ -37,12 +37,12 @@ public class PlayerClient extends JComponent implements KeyListener {
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
-		tanks.add(new Tank('Q',1, 435, 330));
-		tanks.add(new Tank('W',1, 435, 390));
-		tanks.add(new Tank('E',1, 435, 450));
+		tanks.add(new Tank("Q",1, 435, 330));
+		tanks.add(new Tank("W",1, 435, 390));
+		tanks.add(new Tank("E",1, 435, 450));
 		selected = tanks.get(0);
 		selected.setSelected(true);
-		enemyTanks.add(new Tank('Q', 2, 300, 300));
+		enemyTanks.add(new Tank("Q", 2, 300, 300));
 		addKeyListener(this);
 		setFocusable(true);
 		map = new Map();
@@ -145,10 +145,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 		return false;
 	}
 	
-	// checks to see if take collides with wall
+	// checks to see if tank collides with wall
 	public boolean wallCollision() {
 		for (Rectangle2D wall : map.getWalls()) {
 			if (selected.getRect().intersects(wall)) {
+				return true;
+			}
+		}
+		for (SpawnZone wall : map.spawn) {
+			if (selected.getRect().intersects(wall.rect) && selected.team != wall.team) {
 				return true;
 			}
 		}

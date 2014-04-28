@@ -10,12 +10,13 @@ public class Map {
 	ArrayList<Rectangle2D> walls = new ArrayList<Rectangle2D>();
 	ArrayList<Rectangle2D> flagSpawns = new ArrayList<Rectangle2D>();
 	ArrayList<Rectangle2D> spawnZones = new ArrayList<Rectangle2D>();
+	ArrayList<SpawnZone> spawn = new ArrayList<SpawnZone>();
 	ArrayList<Rectangle2D> safeZones = new ArrayList<Rectangle2D>();
 	
 	public Map() {
 		addWalls();
 		
-		//addFlags();
+		addFlags();
 		addSpawns();
 		//addSafeZones();
 	}
@@ -23,8 +24,12 @@ public class Map {
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		drawGrid(g2d);
-		drawRects(g2d, spawnZones, Color.YELLOW);
+		//drawRects(g2d, spawnZones, Color.YELLOW);
+		for (SpawnZone s : spawn) {
+			s.paintComponent(g2d);
+		}
 		drawRects(g2d, walls, Color.GREEN);
+		drawRects(g2d, flagSpawns, Color.CYAN);
 		
 	}
 	
@@ -42,8 +47,15 @@ public class Map {
 		g2d.drawLine(500, 0, 500, 800);
 	}
 	
+	public void addFlags() {
+		mirrorRect(100, 400, 30, 30,flagSpawns);
+	}
+	
 	public void addSpawns() {
 		mirrorRect(430, 320, 70, 200, spawnZones);
+		spawn.add(new SpawnZone(spawnZones.get(0), 1));
+		spawn.add(new SpawnZone(spawnZones.get(1), 2));
+		
 	}
 	
 	public void addWalls() {
