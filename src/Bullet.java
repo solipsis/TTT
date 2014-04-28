@@ -46,4 +46,12 @@ public class Bullet {
 				break;
 		}
 	}
+
+	public Rectangle2D getRect() {
+		return rect;
+	}
+
+	public void setRect(Rectangle2D rect) {
+		this.rect = rect;
+	}
 }

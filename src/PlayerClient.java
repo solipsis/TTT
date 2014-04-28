@@ -2,6 +2,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -19,6 +20,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 
 	private ArrayList<Tank> tanks;
+	private ArrayList<Tank> enemyTanks;
 	private Tank selected;
 	boolean shouldMove;
 	boolean isRunning; // used for gameloop
@@ -30,11 +32,14 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	public PlayerClient() {
 		hm = new HashMap<>();
+		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
 		tanks.add(new Tank(50,50,'Q',1));
 		tanks.add(new Tank(100,100,'W',1));
 		tanks.add(new Tank(200,200,'E',1));
 		selected = tanks.get(0);
+		selected.setSelected(true);
+		enemyTanks.add(new Tank(300,300,'Q', 2));
 		addKeyListener(this);
 		setFocusable(true);
 		setupHashMap();
@@ -54,6 +59,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 	public void paintComponent(Graphics g) {
 		//Graphics2D g2d = (Graphics2D) g;
 		for (Tank t : tanks) {
+			t.paintComponent(g);
+		}
+		for (Tank t : enemyTanks) {
 			t.paintComponent(g);
 		}
 	}
@@ -76,12 +84,44 @@ public class PlayerClient extends JComponent implements KeyListener {
 	public void updateLogic() {
 		if (shouldMove) {
 			if (selected != null) {
+				Rectangle2D rect = selected.getRect();
+				Rectangle2D oldRect = new Rectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 				selected.move();
+				// if there is a collision than roll back the movement
+				if (playerCollision()) {
+					System.out.println("collision detected");
+					selected.setRect(oldRect);
+				}
 			}
 			repaint();
 		}
 		for (Tank t : tanks) {
 			t.gameTick();
+		}
+		checkForHitByEnemy();
+	}
+	
+	// checks to see if 2 tanks collide
+	public boolean playerCollision() {
+		for (Tank enemy : enemyTanks) {
+			if (selected.getRect().intersects(enemy.getRect())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	public void checkForHitByEnemy() {
+		for (Tank t : tanks) {
+			Rectangle2D rect = t.getRect();
+			for (Tank e : enemyTanks) {
+				for (Bullet b : e.bullets) {
+					if (rect.intersects(b.getRect())) {
+						
+					}
+				}
+			}
 		}
 	}
 	
@@ -104,22 +144,35 @@ public class PlayerClient extends JComponent implements KeyListener {
 		//System.out.println(e.getKeyCode());
 		
 		if (e.getKeyCode() == 81) { // Q
-			if (selected == tanks.get(0))
+			if (selected == tanks.get(0)) {
+				selected.setSelected(false);
 				selected = null;
-			else
+			}
+			else {
 				selected = tanks.get(0);
+				selected.setSelected(true);
+			}
 		}
+		
 		if (e.getKeyCode() == 87) { // W
-			if (selected == tanks.get(1))
+			if (selected == tanks.get(1)) {
+				selected.setSelected(false);
 				selected = null;
-			else
+			}
+			else {
 				selected = tanks.get(1);
+				selected.setSelected(true);
+			}
 		}
 		if (e.getKeyCode() == 69) { // E
-			if (selected == tanks.get(2))
+			if (selected == tanks.get(2)) {
+				selected.setSelected(false);
 				selected = null;
-			else
+			}
+			else {
 				selected = tanks.get(2);
+				selected.setSelected(true);
+			}
 		}
 		if (selected != null) {
 			if(e.getKeyCode() == 38) {

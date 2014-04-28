@@ -59,7 +59,6 @@ public class Tank {
 	}
 	
 	public void shootBullet() {
-		
 		bullets.add(new Bullet(team, direction, (int)rect.getX() + 10, (int)rect.getY() + 10));
 	}
 	
@@ -95,6 +94,10 @@ public class Tank {
 		}
 	}
 	
+	public void die() {
+		rect = new Rectangle2D.Double(500,500,20,20);
+	}
+	
 	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}
@@ -102,6 +105,31 @@ public class Tank {
 	public Direction getDirection() {
 		return direction;
 	}
+
+
+	public Rectangle2D getRect() {
+		return rect;
+	}
+
+
+	public void setRect(Rectangle2D rect) {
+		this.rect = rect;
+	}
+
+
+	public boolean isSelected() {
+		return isSelected;
+	}
+
+
+	public void setSelected(boolean isSelected) {
+		this.isSelected = isSelected;
+	}
+
+
+	
+	
+	
 	
 	
 	
