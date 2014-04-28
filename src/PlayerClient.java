@@ -37,12 +37,12 @@ public class PlayerClient extends JComponent implements KeyListener {
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
-		tanks.add(new Tank(250,200,'Q',1));
-		tanks.add(new Tank(200,200,'W',1));
-		tanks.add(new Tank(200,250,'E',1));
+		tanks.add(new Tank('Q',1, 435, 330));
+		tanks.add(new Tank('W',1, 435, 390));
+		tanks.add(new Tank('E',1, 435, 450));
 		selected = tanks.get(0);
 		selected.setSelected(true);
-		enemyTanks.add(new Tank(300,300,'Q', 2));
+		enemyTanks.add(new Tank('Q', 2, 300, 300));
 		addKeyListener(this);
 		setFocusable(true);
 		map = new Map();
@@ -112,6 +112,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 		}
 		for (Tank t : enemyTanks) {
 			t.gameTick();
+			toRemove.clear();
+			ArrayList<Bullet> toRemove = bulletCollision(t.bullets);
+			t.bullets.removeAll(toRemove);
 		}
 		checkForHitByEnemy();
 	}

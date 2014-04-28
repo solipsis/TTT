@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Tank {
 	
 	private boolean isSelected;
+	private boolean dead;
 	private boolean hasFlag;
 	final int speed = 3;
 	final int size = 40;
@@ -17,13 +18,19 @@ public class Tank {
 	char id = ' ';
 	int team;
 	int shootTimer;
+	int deathTimer;
+	int spawnX;
+	int spawnY;
 	Color color;
 	ArrayList<Bullet> bullets;
 	
-	public Tank(int x, int y, char id, int team ) {
+	public Tank(char id, int team, int spawnX, int spawnY ) {
 		bullets = new ArrayList<Bullet>();
+		this.spawnX = spawnX;
+		this.spawnY = spawnY;
+		dead = false;
 		direction = Direction.UP;
-		rect = new Rectangle2D.Double(x, y, size, size);
+		rect = new Rectangle2D.Double(spawnX, spawnY, size, size);
 		isSelected = false;
 		hasFlag = false;
 		shootTimer = 30;
@@ -36,23 +43,26 @@ public class Tank {
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(color);
-		// Rectangle2D doesnt have an int version. why...
-		g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
+		
+		
 		for(Bullet b : bullets) {
 			b.paintComponent(g2d);
 		}
-		g2d.setColor(Color.BLACK);
-		g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		if (!dead) {
+			g2d.setColor(color);
+			// Rectangle2D doesnt have an int version. why...
+			g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
+			g2d.setColor(Color.BLACK);
+			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		
-		//highlight the selected tank
-		if (isSelected) {
-			g2d.setColor(Color.BLUE);
-			g2d.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			//highlight the selected tank
+			if (isSelected) {
+				g2d.setColor(Color.BLUE);
+				g2d.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			}
+			g2d.drawRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());	
+			drawCannon(g2d);
 		}
-		g2d.drawRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
-		
-		drawCannon(g2d);
-		
 	}
 	
 	public void gameTick() {
@@ -66,6 +76,14 @@ public class Tank {
 		else {
 			shootTimer = 50;
 		}
+		
+		if (dead) {
+			deathTimer--;
+			if (deathTimer <= 0) {
+				dead = false;
+			}
+		}
+		
 		for (Bullet b : bullets) {
 			b.move();
 		}
@@ -105,38 +123,41 @@ public class Tank {
 	
 	
 	public void move() {
-		
-		double x = rect.getX();
-		double y = rect.getY();
-		double w = rect.getWidth();
-		double h = rect.getHeight();
-		
-		// a tank moves slower if it holds the flag
-		int speed = this.speed;
-		if (hasFlag) {
-			speed *= .5;
-		}
-		
-		switch (direction) {
-			case UP:
-				rect.setFrame(x, y-speed, w, h);
-				break;
-			case DOWN:
-				rect.setRect(x, y+speed, w, h);
-				break;
-			case LEFT:
-				rect.setRect(x-speed, y, w, h);
-				break;
-			case RIGHT:
-				rect.setRect(x+speed, y, w, h);
-				break;
-			default:
-				break;
+		if (!dead) {
+			double x = rect.getX();
+			double y = rect.getY();
+			double w = rect.getWidth();
+			double h = rect.getHeight();
+			
+			// a tank moves slower if it holds the flag
+			int speed = this.speed;
+			if (hasFlag) {
+				speed *= .5;
+			}
+			
+			switch (direction) {
+				case UP:
+					rect.setFrame(x, y-speed, w, h);
+					break;
+				case DOWN:
+					rect.setRect(x, y+speed, w, h);
+					break;
+				case LEFT:
+					rect.setRect(x-speed, y, w, h);
+					break;
+				case RIGHT:
+					rect.setRect(x+speed, y, w, h);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 	
 	public void die() {
-		rect = new Rectangle2D.Double(500,500,size,size);
+		dead = true;
+		deathTimer = 500;
+		rect = new Rectangle2D.Double(spawnX, spawnY, size, size);
 	}
 	
 	public void setDirection(Direction direction) {
