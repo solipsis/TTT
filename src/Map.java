@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Map {
 	ArrayList<Rectangle2D> walls = new ArrayList<Rectangle2D>();
 	ArrayList<Rectangle2D> flagSpawns = new ArrayList<Rectangle2D>();
+	ArrayList<Flag> flags = new ArrayList<Flag>();
 	ArrayList<Rectangle2D> spawnZones = new ArrayList<Rectangle2D>();
 	ArrayList<SpawnZone> spawn = new ArrayList<SpawnZone>();
 	ArrayList<Rectangle2D> safeZones = new ArrayList<Rectangle2D>();
@@ -49,6 +50,8 @@ public class Map {
 	
 	public void addFlags() {
 		mirrorRect(100, 400, 30, 30,flagSpawns);
+		flags.add(new Flag(flagSpawns.get(0), 1));
+		flags.add(new Flag(flagSpawns.get(1), 2));
 	}
 	
 	public void addSpawns() {

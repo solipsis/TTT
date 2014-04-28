@@ -194,6 +194,16 @@ public class Tank {
 	}
 
 
+	public boolean isHasFlag() {
+		return hasFlag;
+	}
+
+
+	public void setHasFlag(boolean hasFlag) {
+		this.hasFlag = hasFlag;
+	}
+
+
 	
 	
 	

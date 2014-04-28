@@ -101,6 +101,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 				if (wallCollision()) {
 					selected.setRect(oldRect);
 				}
+				flagCollision();
+				
 			}
 			repaint();
 		}
@@ -117,6 +119,30 @@ public class PlayerClient extends JComponent implements KeyListener {
 			t.bullets.removeAll(toRemove);
 		}
 		checkForHitByEnemy();
+	}
+	
+	public void flagCollision() {
+		for (Flag f : map.flags) {
+			if (f.rect.intersects(selected.getRect())) {
+				if (selected.team == f.team) {
+					if (selected.isHasFlag()) {
+						score();
+						f.score();
+						
+					}
+				}
+				else {
+					selected.setHasFlag(true);
+				}
+				
+				
+			}
+		}
+	}
+	
+	public void score() {
+		selected.setHasFlag(false);
+		//add points;
 	}
 	
 	public ArrayList<Bullet> bulletCollision(ArrayList<Bullet> bullets) {
