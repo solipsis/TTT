@@ -18,7 +18,7 @@ public class Bullet {
 	}
 	
 	public void paintComponent(Graphics2D g2d) {
-		g2d.setColor(Color.RED);
+		g2d.setColor(Color.GREEN);
 		// Rectangle2D doesnt have an int version. why...
 		g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 	}

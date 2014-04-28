@@ -80,10 +80,13 @@ public class PlayerClient extends JComponent implements KeyListener {
 			}
 			repaint();
 		}
+		for (Tank t : tanks) {
+			t.gameTick();
+		}
 	}
 	
 	public void updateRendering() {
-		
+		repaint();
 	}
 	
 	

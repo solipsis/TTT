@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 
 public class Tank {
@@ -9,15 +10,17 @@ public class Tank {
 	private boolean isSelected;
 	private boolean hasFlag;
 	final int speed = 5;
-	final int size = 20;
+	final int size = 40;
 	private Direction direction;
 	private Rectangle2D rect;
 	char id = ' ';
 	int team;
 	int shootTimer;
 	Color color;
+	ArrayList<Bullet> bullets;
 	
 	public Tank(int x, int y, char id, int team ) {
+		bullets = new ArrayList<Bullet>();
 		direction = Direction.UP;
 		rect = new Rectangle2D.Double(x, y, size, size);
 		isSelected = false;
@@ -33,6 +36,9 @@ public class Tank {
 		g2d.setColor(Color.RED);
 		// Rectangle2D doesnt have an int version. why...
 		g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
+		for(Bullet b : bullets) {
+			b.paintComponent(g2d);
+		}
 	}
 	
 	public void gameTick() {
@@ -46,10 +52,15 @@ public class Tank {
 		else {
 			shootTimer = 50;
 		}
+		for (Bullet b : bullets) {
+			b.move();
+		}
+		
 	}
 	
 	public void shootBullet() {
 		
+		bullets.add(new Bullet(team, direction, (int)rect.getX() + 10, (int)rect.getY() + 10));
 	}
 	
 	
