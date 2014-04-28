@@ -1,0 +1,64 @@
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+
+
+public class Map {
+	ArrayList<Rectangle2D> walls = new ArrayList<Rectangle2D>();
+	ArrayList<Rectangle2D> flagSpawns = new ArrayList<Rectangle2D>();
+	ArrayList<Rectangle2D> spawnZones = new ArrayList<Rectangle2D>();
+	ArrayList<Rectangle2D> safeZones = new ArrayList<Rectangle2D>();
+	
+	public Map() {
+		addWalls();
+		
+		//addFlags();
+		//addSpawns();
+		//addSafeZones();
+	}
+	
+	public void paintComponent(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		drawGrid(g2d);
+		for (Rectangle2D rect : walls) {
+			//System.out.println("walls");
+			g2d.setColor(Color.GREEN);
+			g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
+			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g2d.setColor(Color.BLACK);
+			g2d.drawRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
+		}
+	}
+	
+	public void drawGrid(Graphics2D g2d) {
+		g2d.drawLine(500, 0, 500, 800);
+	}
+	
+	public void addWalls() {
+		walls.add(new Rectangle2D.Double(0, 100, 1000, 40)); //top bar
+		walls.add(new Rectangle2D.Double(0, 720, 1000, 40)); //bottom bar
+		//walls.add(new Rectangle2D.Double(0, 100, 40, 700));  // left bar
+		//walls.add(new Rectangle2D.Double(960, 100, 40, 700)); //right bar
+		mirrorRect(0, 100, 40, 700, walls);
+		//walls.add(new Rectangle2D.Double(40, 140, 150, 60));
+		//walls.add(new Rectangle2D.Double(810, 140, 150, 60));
+		mirrorRect(40, 140, 150, 60, walls); //top corners
+		mirrorRect(300, 200, 120, 15, walls); //top mid
+		mirrorRect(490, 225, 10, 60, walls); // mid slit
+		mirrorRect(480, 320, 20, 200, walls); // mid divider 
+		mirrorRect(400, 600, 100, 10, walls); // lower mid line 
+		mirrorRect(460, 680, 40, 40, walls);  //lower mid block
+		mirrorRect(200, 675, 40, 45, walls); // outer lower block
+		mirrorRect(300, 620, 40, 40, walls); // lower upper block
+		mirrorRect(120, 540, 50, 50, walls);
+	}
+	
+	public void mirrorRect(int x, int y, int w, int h, ArrayList<Rectangle2D> list) {
+		list.add(new Rectangle2D.Double(x,y,w,h));
+		list.add(new Rectangle2D.Double(1000-w-x, y, w, h));
+	}
+	
+}

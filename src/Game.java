@@ -27,7 +27,7 @@ public class Game {
 		selectFrame.add(launchClient);
 		
 		final JFrame gameFrame = new JFrame("TTT");
-		gameFrame.setSize(800,800);
+		gameFrame.setSize(1020,840);
 		gameFrame.setVisible(false);
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		

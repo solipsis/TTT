@@ -28,6 +28,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	Direction direction; // the direction to move in
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
+	Map map;
 	
 	
 	public PlayerClient() {
@@ -42,6 +43,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 		enemyTanks.add(new Tank(300,300,'Q', 2));
 		addKeyListener(this);
 		setFocusable(true);
+		map = new Map();
+		
 		setupHashMap();
 		//shouldMove = true;
 		gameLoop();
@@ -57,6 +60,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	@Override
 	public void paintComponent(Graphics g) {
+		map.paintComponent(g);
 		//Graphics2D g2d = (Graphics2D) g;
 		for (Tank t : tanks) {
 			t.paintComponent(g);
@@ -134,49 +138,21 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	
 	
-	
-	
-
-	//TODO: change so that key pressed simply sets a variable.
-	//every time the game loop is called and that variable is true, keep moving.
-	// key released sets that to false
-	//repaint should be moved to game loop
-	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		//System.out.println(e.getKeyCode());
 		
 		if (e.getKeyCode() == 81) { // Q
-			selected.setSelected(false);
-			if (selected == tanks.get(0)) {
-				selected = null;
-			}
-			else {
-				selected = tanks.get(0);
-				selected.setSelected(true);
-			}
+			handleSelection(0);
 		}
 		
 		if (e.getKeyCode() == 87) { // W
-			selected.setSelected(false);
-			if (selected == tanks.get(1)) {
-				selected = null;
-			}
-			else {
-				selected = tanks.get(1);
-				selected.setSelected(true);
-			}
+			handleSelection(1);
 		}
 		if (e.getKeyCode() == 69) { // E
-			selected.setSelected(false);
-			if (selected == tanks.get(2)) {
-				selected = null;
-			}
-			else {
-				selected = tanks.get(2);
-				selected.setSelected(true);
-			}
+			handleSelection(2);
 		}
+		
 		if (selected != null) {
 			if(e.getKeyCode() == 38) {
 				selected.setDirection(Direction.UP);
@@ -195,6 +171,19 @@ public class PlayerClient extends JComponent implements KeyListener {
 				shouldMove = true;
 			}
 			previousDirection = selected.getDirection();
+		}
+	}
+	
+	public void handleSelection(int x) {
+		if (selected != null) {
+			selected.setSelected(false);
+		}
+		if (selected == tanks.get(x)) {
+			selected = null;
+		}
+		else {
+			selected = tanks.get(x);
+			selected.setSelected(true);
 		}
 	}
 
