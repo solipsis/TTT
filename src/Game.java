@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -39,7 +40,15 @@ public class Game {
 		launchServer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Server will be launched when I get around to it.");
+				GameServer server = new GameServer();
+				selectFrame.setVisible(false);
+				serverFrame.setVisible(true);
+				try {
+					server.listen();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		launchClient.addActionListener(new ActionListener() {
@@ -52,5 +61,6 @@ public class Game {
 				selectFrame.setVisible(false);
 			}
 		});	
+		
 	}
 }

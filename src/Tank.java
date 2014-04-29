@@ -213,9 +213,16 @@ public class Tank {
 		this.color = color;
 	}
 
-
+	public double getX(){
+		return rect.getX();
+	}
+	public double getY(){
+		return rect.getY();
+	}
 	
-	
+	public String getId(){
+		return id;
+	}
 	
 	
 	

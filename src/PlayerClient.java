@@ -4,6 +4,13 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -13,13 +20,9 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-
-
-
 public class PlayerClient extends JComponent implements KeyListener {
-	
-	
 
+	private static final int PORT = 5500;
 	private ArrayList<Tank> tanks;
 	private ArrayList<Tank> enemyTanks;
 	private ArrayList<Bullet> toRemove;
@@ -31,58 +34,73 @@ public class PlayerClient extends JComponent implements KeyListener {
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
 	Map map;
-	
-	
+	BufferedReader in;
+	PrintWriter out;
+
 	public PlayerClient() {
+		// #shitstorm
+		Socket clientSocket;
+		try {
+			clientSocket = new Socket(InetAddress.getLocalHost()
+					.getHostAddress(), PORT);
+			in = new BufferedReader(new InputStreamReader(
+					clientSocket.getInputStream()));
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		hm = new HashMap<>();
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
 		initializeTanks();
-		
+
 		addKeyListener(this);
 		setFocusable(true);
 		map = new Map();
-		
-		
-		//ArrayList<Tank> temp = tanks;
-		//tanks = enemyTanks;
-		//enemyTanks = temp;
-		
+
+		// ArrayList<Tank> temp = tanks;
+		// tanks = enemyTanks;
+		// enemyTanks = temp;
+
 		setupHashMap();
-		
+
 		gameLoop();
-		
+
 	}
-	
+
 	public void initializeTanks() {
-		tanks.add(new Tank("Q",1, 435, 330));
-		tanks.add(new Tank("W",1, 435, 390));
-		tanks.add(new Tank("E",1, 435, 450));
-		enemyTanks.add(new Tank("Q", 2,800, 600));
+		tanks.add(new Tank("Q", 1, 435, 330));
+		tanks.add(new Tank("W", 1, 435, 390));
+		tanks.add(new Tank("E", 1, 435, 450));
+		enemyTanks.add(new Tank("Q", 2, 800, 600));
 		enemyTanks.add(new Tank("W", 2, 525, 390));
 		enemyTanks.add(new Tank("E", 2, 525, 450));
-		for (Tank t: tanks) {
+		for (Tank t : tanks) {
 			t.setColor(Color.magenta);
 		}
-		for (Tank t: enemyTanks) {
+		for (Tank t : enemyTanks) {
 			t.setColor(Color.red);
 		}
 		selected = tanks.get(0);
 		selected.setSelected(true);
 	}
-	
+
 	public void setupHashMap() {
 		hm.put(38, Direction.UP);
 		hm.put(40, Direction.DOWN);
 		hm.put(37, Direction.LEFT);
 		hm.put(39, Direction.RIGHT);
 	}
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		map.paintComponent(g);
-		//Graphics2D g2d = (Graphics2D) g;
+		// Graphics2D g2d = (Graphics2D) g;
 		for (Tank t : tanks) {
 			t.paintComponent(g);
 		}
@@ -90,27 +108,27 @@ public class PlayerClient extends JComponent implements KeyListener {
 			t.paintComponent(g);
 		}
 	}
-	
-	
+
 	public void gameLoop() {
 		timer = new Timer();
 		timer.schedule(new UpdateLoop(), 0, 1000 / 60);
 	}
-	
+
 	private class UpdateLoop extends TimerTask {
 		@Override
 		public void run() {
 			updateLogic();
-			updateRendering();	
+			updateRendering();
 		}
-		
+
 	}
-	
+
 	public void updateLogic() {
 		if (shouldMove) {
 			if (selected != null) {
 				Rectangle2D rect = selected.getRect();
-				Rectangle2D oldRect = new Rectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+				Rectangle2D oldRect = new Rectangle2D.Double(rect.getX(),
+						rect.getY(), rect.getWidth(), rect.getHeight());
 				selected.move();
 				// if there is a collision than roll back the movement
 				if (playerCollision()) {
@@ -120,7 +138,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 				if (wallCollision()) {
 					selected.setRect(oldRect);
 				}
-				flagCollision();	
+				flagCollision();
+				out.println(selected.getId() + " " + selected.getX() + " " + selected.getY());
 			}
 			repaint();
 		}
@@ -138,7 +157,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 		}
 		checkForHitByEnemy();
 	}
-	
+
 	public void flagCollision() {
 		for (Flag f : map.flags) {
 			if (f.rect.intersects(selected.getRect())) {
@@ -148,20 +167,19 @@ public class PlayerClient extends JComponent implements KeyListener {
 						map.flags.get(0).score();
 						map.flags.get(1).score();
 					}
-				}
-				else {
+				} else {
 					f.pickedUp = true;
 					selected.setHasFlag(true);
-				}				
+				}
 			}
 		}
 	}
-	
+
 	public void score() {
 		selected.setHasFlag(false);
-		//add points;
+		// add points;
 	}
-	
+
 	public ArrayList<Bullet> bulletCollision(ArrayList<Bullet> bullets) {
 		for (Bullet b : bullets) {
 			for (Rectangle2D wall : map.getWalls()) {
@@ -177,17 +195,17 @@ public class PlayerClient extends JComponent implements KeyListener {
 		}
 		return toRemove;
 	}
-	
+
 	// checks to see if 2 enemy tanks collide
 	public boolean playerCollision() {
 		for (Tank enemy : enemyTanks) {
-			if (selected.getRect().intersects(enemy.getRect())){
+			if (selected.getRect().intersects(enemy.getRect())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	// checks to see if tank collides with wall
 	public boolean wallCollision() {
 		for (Rectangle2D wall : map.getWalls()) {
@@ -196,13 +214,14 @@ public class PlayerClient extends JComponent implements KeyListener {
 			}
 		}
 		for (SpawnZone wall : map.spawn) {
-			if (selected.getRect().intersects(wall.rect) && selected.team != wall.team) {
+			if (selected.getRect().intersects(wall.rect)
+					&& selected.team != wall.team) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	public void checkForHitByEnemy() {
 		for (Tank t : tanks) {
 			Rectangle2D rect = t.getRect();
@@ -213,8 +232,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 							// take proper action if dead tank was carrying flag
 							if (t.team == 1) {
 								map.flags.get(1).drop();
-							}
-							else {
+							} else {
 								map.flags.get(0).drop();
 							}
 						}
@@ -224,16 +242,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 			}
 		}
 	}
-	
+
 	public void updateRendering() {
 		repaint();
 	}
-	
-	
+
 	@Override
 	public void keyPressed(KeyEvent e) {
-		//System.out.println(e.getKeyCode());
-		
+		// System.out.println(e.getKeyCode());
+
 		if (e.getKeyCode() == 81) { // Q
 			handleSelection(0);
 		}
@@ -243,36 +260,35 @@ public class PlayerClient extends JComponent implements KeyListener {
 		if (e.getKeyCode() == 69) { // E
 			handleSelection(2);
 		}
-		
+
 		if (selected != null) {
-			if(e.getKeyCode() == 38) {
+			if (e.getKeyCode() == 38) {
 				selected.setDirection(Direction.UP);
-				shouldMove = true;				
+				shouldMove = true;
 			}
-			if(e.getKeyCode() == 39) {
+			if (e.getKeyCode() == 39) {
 				selected.setDirection(Direction.RIGHT);
-				shouldMove = true;				
+				shouldMove = true;
 			}
-			if(e.getKeyCode() == 40) {
+			if (e.getKeyCode() == 40) {
 				selected.setDirection(Direction.DOWN);
-				shouldMove = true;				
+				shouldMove = true;
 			}
-			if(e.getKeyCode() == 37) {
+			if (e.getKeyCode() == 37) {
 				selected.setDirection(Direction.LEFT);
 				shouldMove = true;
 			}
 			previousDirection = selected.getDirection();
 		}
 	}
-	
+
 	public void handleSelection(int x) {
 		if (selected != null) {
 			selected.setSelected(false);
 		}
 		if (selected == tanks.get(x)) {
 			selected = null;
-		}
-		else {
+		} else {
 			selected = tanks.get(x);
 			selected.setSelected(true);
 		}
@@ -280,14 +296,17 @@ public class PlayerClient extends JComponent implements KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (hm.get(e.getKeyCode()) == previousDirection) { //allows for smooth directional changes
+		if (hm.get(e.getKeyCode()) == previousDirection) { // allows for smooth
+															// directional
+															// changes
 			shouldMove = false;
 		}
-		
+
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {}
-	
+	public void keyTyped(KeyEvent e) {
+	}
+
 	private static final long serialVersionUID = 1L;
 }

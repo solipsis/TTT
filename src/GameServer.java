@@ -55,6 +55,10 @@ public class GameServer {
 			this.socket = socket;
 		}
 		
+		public void sendPlayerId(){
+			//send the player's id based on the threads position in the players arraylist
+		}
+		
 		public void sendToAll(String message) throws IOException{
 			for (PlayerThread player : players){
 				if (player.getSocket() != socket){
@@ -76,6 +80,7 @@ public class GameServer {
 					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					while(true){
 						messages.add(in.readLine());
+						System.out.println(in.readLine());
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -87,19 +92,19 @@ public class GameServer {
 		public void run() {
 			new MessageBuilder().start();
 
-			try {
-				
-				while (true){ //need an exit condition
-					sendToAll(messages.take());
-				}
-				
-				
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				
+//				while (true){ //need an exit condition
+//					sendToAll(messages.take());
+//				}
+//				
+//				
+//				
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 }
