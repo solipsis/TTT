@@ -1,6 +1,8 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,12 +32,20 @@ public class Game {
 		final JFrame gameFrame = new JFrame("TTT");
 		gameFrame.setSize(1020,840);
 		gameFrame.setVisible(false);
-		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		final JFrame serverFrame = new JFrame("TTT");
 		serverFrame.setSize(300,200);
-		serverFrame.setVisible(false);
-		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		try {
+			JLabel info = new JLabel("Server Launched, please connect to " + InetAddress.getLocalHost()
+						.getHostAddress());	
+			info.setBounds(10,10,500,500);
+			serverFrame.add(info);
+			serverFrame.setVisible(false);
+			serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		} catch (UnknownHostException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		
 		launchServer.addActionListener(new ActionListener() {
 			@Override
@@ -43,10 +53,13 @@ public class Game {
 				GameServer server = new GameServer();
 				selectFrame.setVisible(false);
 				serverFrame.setVisible(true);
+				serverFrame.validate();
+				serverFrame.repaint();
 				try {
 					server.listen();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
+					System.out.println("disconnect in server action listener");
 					e1.printStackTrace();
 				}
 			}

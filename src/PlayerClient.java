@@ -48,9 +48,11 @@ public class PlayerClient extends JComponent implements KeyListener {
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
+			System.out.println("disconnect in player client first exception");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			System.out.println("disconnect in player client second exception");
 			e.printStackTrace();
 		}
 		hm = new HashMap<>();

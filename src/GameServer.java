@@ -11,11 +11,14 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import javax.swing.JOptionPane;
+
 public class GameServer {
 
 	private static final int PORT = 5500;
 	 	
-	 	private static final int MESSAGE_QUEUE_MAX = 500; //as a tentative start
+	 	private static final int MAX_PLAYERS = 2;
+		private static final int MESSAGE_QUEUE_MAX = 500; //as a tentative start
 	 	private BlockingQueue<String> messages;
 	 
 	 	ArrayList<PlayerThread> players;
@@ -28,10 +31,13 @@ public class GameServer {
 	  	}
 	 
 	 	public void listen() throws IOException {
+	 		System.out.println("starting listener");
 	  		listener = new ServerSocket(PORT);
 	  		try {
+	  			System.out.println("starting loop");
 	 			while (true) {
 	 				new PlayerThread(listener.accept()).start();
+	 				System.out.println("looping...");
 	  			}
 	  		} finally {
 	  			listener.close();
@@ -83,7 +89,7 @@ public class GameServer {
 						System.out.println(in.readLine());
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
