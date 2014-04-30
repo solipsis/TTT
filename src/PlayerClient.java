@@ -36,6 +36,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	HashMap<Integer, Direction> hm;
 	Map map;
 	Socket socket;
+	private int playerId;
 	//BufferedReader in;
 	//PrintWriter out;
 	
@@ -78,6 +79,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 				//Socket socket = new Socket(InetAddress.getLocalHost()
 				//		.getHostAddress(), PORT);
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				playerId = Integer.parseInt(in.readLine());
+				System.out.println("my id is " + playerId);
 				
 				while(true){
 					String input = in.readLine();

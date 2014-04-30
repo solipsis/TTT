@@ -20,6 +20,7 @@ public class GameServer extends JComponent{
 	 	private static final int MAX_PLAYERS = 2;
 		private static final int MESSAGE_QUEUE_MAX = 500; //as a tentative start
 	 	private BlockingQueue<String> messages;
+	 	private int index;
 	 
 	 	ArrayList<PlayerThread> players;
 	  	ServerSocket listener;
@@ -29,6 +30,7 @@ public class GameServer extends JComponent{
 	  	public GameServer() {
 	 		players = new ArrayList<PlayerThread>();
 	 		messages = new ArrayBlockingQueue<String>(MESSAGE_QUEUE_MAX);
+	 		index = 0;
 	  	}
 	 
 	 	public void listen() throws IOException {
@@ -42,7 +44,9 @@ public class GameServer extends JComponent{
 			  			//System.out.println("starting loop");
 			 			while (true) {
 			 				try {
-								new PlayerThread(listener.accept()).start();
+								players.add(new PlayerThread(listener.accept()));
+								players.get(index).start();
+								index ++;
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -106,6 +110,7 @@ public class GameServer extends JComponent{
 				try {
 					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					out = new PrintWriter(socket.getOutputStream(), true);
+					out.println(index);
 					while(true){
 						
 						String input = in.readLine();
