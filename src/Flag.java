@@ -5,6 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 
+/**
+ * Flag class that handles the drawing of the flag and the ways it appears when it is picked up and dropped
+ *
+ */
 public class Flag {
 	Rectangle2D rect;
 	int team;
@@ -19,6 +23,11 @@ public class Flag {
 		this.spawnY = (int)rect.getY();
 	}
 	
+	/**
+	 * Draws the flag based on a Rectangle2D object
+	 * 
+	 * @param g
+	 */
 	public void paintComponent(Graphics g) {
 		if (!pickedUp) {
 			Graphics2D g2d = (Graphics2D) g;

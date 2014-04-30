@@ -9,6 +9,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 
+/**
+ * The main class where the program launches from, provides a simple GUI to allow users to launch a server or client
+ *
+ */
 public class Game {
 
 	

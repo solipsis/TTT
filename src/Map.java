@@ -6,6 +6,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 
+/**
+ * Map class that draws the map that the game is played on, includes the walls, spawn zones and flags
+ *
+ */
 public class Map {
 	ArrayList<Rectangle2D> walls = new ArrayList<Rectangle2D>();
 	ArrayList<Rectangle2D> flagSpawns = new ArrayList<Rectangle2D>();
@@ -22,6 +26,11 @@ public class Map {
 		//addSafeZones();
 	}
 	
+	/**
+	 * Draws the map based on the spawn zone locations, flag locations and the drawRects function
+	 * 
+	 * @param g
+	 */
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		drawGrid(g2d);
@@ -37,6 +46,13 @@ public class Map {
 		
 	}
 	
+	/**
+	 * Draws the walls for the map
+	 * 
+	 * @param g2d
+	 * @param rects
+	 * @param color
+	 */
 	public void drawRects(Graphics2D g2d, ArrayList<Rectangle2D> rects, Color color) {
 		for (Rectangle2D rect : rects) {
 			g2d.setColor(color);
@@ -47,16 +63,29 @@ public class Map {
 		}
 	}
 	
+	/**
+	 * Draws a grid to position the entities on the map
+	 * 
+	 * @param g2d
+	 */
 	public void drawGrid(Graphics2D g2d) {
 		g2d.drawLine(500, 0, 500, 800);
 	}
 	
+	/**
+	 * Ddds the flags to the map
+	 * 
+	 */
 	public void addFlags() {
 		mirrorRect(100, 400, 30, 30,flagSpawns);
 		flags.add(new Flag(flagSpawns.get(0), 1));
 		flags.add(new Flag(flagSpawns.get(1), 2));
 	}
 	
+	/**
+	 * Adds the spawn zones to the map
+	 * 
+	 */
 	public void addSpawns() {
 		mirrorRect(430, 320, 70, 200, spawnZones);
 		spawn.add(new SpawnZone(spawnZones.get(0), 1));
@@ -64,6 +93,10 @@ public class Map {
 		
 	}
 	
+	/**
+	 * Adds the walls to the map by utilizing the mirrorRect function
+	 * 
+	 */
 	public void addWalls() {
 		walls.add(new Rectangle2D.Double(0, 100, 1000, 40)); //top bar
 		walls.add(new Rectangle2D.Double(0, 720, 1000, 40)); //bottom bar
@@ -84,7 +117,15 @@ public class Map {
 		mirrorRect(155, 290, 50, 50, walls); 
 	}
 	
-	// creates 2 rectangles mirrored over the middle
+	/**
+	 * Creates 2 rectangles mirrored over the middle
+	 * 
+	 * @param x
+	 * @param y
+	 * @param w
+	 * @param h
+	 * @param list
+	 */
 	public void mirrorRect(int x, int y, int w, int h, ArrayList<Rectangle2D> list) {
 		list.add(new Rectangle2D.Double(x,y,w,h));
 		list.add(new Rectangle2D.Double(1000-w-x, y, w, h));

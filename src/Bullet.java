@@ -4,6 +4,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 
+/**
+ * Bullet class that handles the drawing and movements of the bullets fired by the tanks
+ * 
+ */
 public class Bullet {
 	final int speed = 6;
 	final int size = 20;
@@ -18,15 +22,23 @@ public class Bullet {
 		this.team = team;
 	}
 	
+	/**
+	 * Draws the bullet based on a Rectangle2D object
+	 * 
+	 * @param g2d
+	 */
 	public void paintComponent(Graphics2D g2d) {
 		g2d.setColor(Color.ORANGE);
-		// Rectangle2D doesnt have an int version. why...
 		g2d.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 		g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		g2d.setColor(Color.BLACK);
 		g2d.drawRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
 	}
 	
+	/**
+	 * Changes the rectangle's x and y positions according to the bullet's speed and direction it is traveling
+	 * 
+	 */
 	public void move() {
 		double x = rect.getX();
 		double y = rect.getY();

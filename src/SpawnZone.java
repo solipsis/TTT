@@ -5,6 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 
+/**
+ * SpawnZone class that handles the drawing of the spawn zones where the tanks start
+ *
+ */
 public class SpawnZone {
 	Rectangle2D rect;
 	int team;
@@ -14,6 +18,11 @@ public class SpawnZone {
 		this.team = team;
 	}
 	
+	/**
+	 * Draws the spawn zones based on Rectangle2D objects
+	 * 
+	 * @param g
+	 */
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(Color.YELLOW);

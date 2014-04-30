@@ -1,0 +1,13 @@
+To Run Tubular Tank Tactician:
+-Run one application as the server by selecting the Launch Server button
+-run two more by selecting the Launch CLient button for each
+-once each has connected, the game will begin
+
+To Play Tubular Tank Tactician:
+-the goal is to capture the flag (blue square) on your opponent's side of the map
+-each player has three tanks(yours are magenta and your enemy's are red)
+-to select a tank press the button it is marked with (for example Q selects the Q tank)
+-once selected, a tank can be moved with the arrow keys to a flag or a tactical spot
+-once another tank is selected, the previous tank will begin shooting in the direction it was facing
+-if a tank is hit by the enemy's bullets, it will drop its flag if it has one and respawn where it started in 5 seconds
+-bring the opponent's flag to your flag to score
