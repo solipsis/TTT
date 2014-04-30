@@ -78,7 +78,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 				while(true){
 					String input[] = in.readLine().split(" ");
 					if (input[0] == "MOVE" ) {
-						
+						enemyTanks.get(idVal.get(input[1])).setRect(new Rectangle2D.Double(Double.parseDouble(input[2]),
+								Double.parseDouble(input[3]), Tank.size, Tank.size));
+						System.out.println("updated position of enemy");
 					}
 					//System.out.println("client got input");
 					//System.out.println(input);

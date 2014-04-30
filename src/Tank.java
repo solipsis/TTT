@@ -13,7 +13,7 @@ public class Tank {
 	private boolean dead;
 	private boolean hasFlag;
 	final int speed = 3;
-	final int size = 40;
+	final static int size = 40;
 	private Direction direction;
 	private Rectangle2D rect;
 	String id = "";

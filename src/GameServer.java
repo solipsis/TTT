@@ -88,7 +88,7 @@ public class GameServer extends JComponent{
 		private BufferedReader in;
 
 		public PlayerThread(Socket socket) {
-			System.out.println("new player thread");
+			//System.out.println("new player thread");
 			this.socket = socket;
 		}
 		
@@ -127,7 +127,7 @@ public class GameServer extends JComponent{
 						
 						String input = in.readLine();
 						//System.out.println("server got input: " + input);
-						out.println("serverMove");
+						out.println(input);
 				
 						if (input == null) {
 							System.out.println("null");
