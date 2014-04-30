@@ -29,10 +29,12 @@ public class PlayerClient extends JComponent implements KeyListener {
 	private ArrayList<Tank> enemyTanks;
 	private ArrayList<Bullet> toRemove;
 	private Tank selected;
+	private Tank selectedEnemy;
 	boolean shouldMove;
+	boolean shouldMoveEnemy;
 	boolean isRunning; // used for gameloop
 	private Timer timer;
-	
+	private int correction;
 	Direction direction; // the direction to move in
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
@@ -67,10 +69,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 
 		new MessageReciever().start();
-		
+
 		stringDir = new HashMap<>();
 		dirString = new HashMap<>();
 		hm = new HashMap<>();
@@ -91,24 +93,25 @@ public class PlayerClient extends JComponent implements KeyListener {
 		initializeTanks();
 		gameLoop();
 
+
 	}
 
 	public void initializeTanks() {
 		
 		if (playerId == 1){
-			tanks.add(new Tank("Q", 1, 435, 330));
-			tanks.add(new Tank("W", 1, 435, 390));
-			tanks.add(new Tank("E", 1, 435, 450));
-			enemyTanks.add(new Tank("Q", 2, 525, 330));
-			enemyTanks.add(new Tank("W", 2, 525, 390));
-			enemyTanks.add(new Tank("E", 2, 525, 450));
+			tanks.add(new Tank("Q", 1, 435, 330,map));
+			tanks.add(new Tank("W", 1, 435, 390,map));
+			tanks.add(new Tank("E", 1, 435, 450,map));
+			enemyTanks.add(new Tank("Q", 2, 525, 330,map));
+			enemyTanks.add(new Tank("W", 2, 525, 390,map));
+			enemyTanks.add(new Tank("E", 2, 525, 450,map));
 		}else{
-			tanks.add(new Tank("Q", 2, 525, 330));
-			tanks.add(new Tank("W", 2, 525, 390));
-			tanks.add(new Tank("E", 2, 525, 450));
-			enemyTanks.add(new Tank("Q", 1, 435, 330));
-			enemyTanks.add(new Tank("W", 1, 435, 390));
-			enemyTanks.add(new Tank("E", 1, 435, 450));
+			tanks.add(new Tank("Q", 2, 525, 330,map));
+			tanks.add(new Tank("W", 2, 525, 390,map));
+			tanks.add(new Tank("E", 2, 525, 450,map));
+			enemyTanks.add(new Tank("Q", 1, 435, 330,map));
+			enemyTanks.add(new Tank("W", 1, 435, 390,map));
+			enemyTanks.add(new Tank("E", 1, 435, 450,map));
 		}
 		for (Tank t : tanks) {
 			t.setColor(Color.magenta);
@@ -117,31 +120,11 @@ public class PlayerClient extends JComponent implements KeyListener {
 			t.setColor(Color.red);
 		}
 		selected = tanks.get(0);
+		//selectedEnemy = enemyTanks.get(0);
 		selected.setSelected(true);
 	}
 
-	public void setupHashMap() {
-		hm.put(38, Direction.UP);
-		hm.put(40, Direction.DOWN);
-		hm.put(37, Direction.LEFT);
-		hm.put(39, Direction.RIGHT);
-		idVal.put("Q", 0);
-		idVal.put("W", 1);
-		idVal.put("E", 2);
-		dir.put("UP", Direction.UP);
-		dir.put("DOWN", Direction.DOWN);
-		dir.put("LEFT", Direction.LEFT);
-		dir.put("RIGHT", Direction.RIGHT);
-		dirString.put( Direction.UP, "U");
-		dirString.put( Direction.DOWN, "D");
-		dirString.put( Direction.LEFT, "L");
-		dirString.put( Direction.RIGHT, "R");
-		stringDir.put("U", Direction.UP);
-		stringDir.put("D", Direction.DOWN);
-		stringDir.put("L", Direction.LEFT);
-		stringDir.put("R", Direction.RIGHT);
-	}
-
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		map.paintComponent(g);
@@ -155,6 +138,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	}
 
 	public void gameLoop() {
+		correction = 30;
 		timer = new Timer();
 		timer.schedule(new UpdateLoop(), 0, 1000 / 30);
 	}
@@ -164,11 +148,30 @@ public class PlayerClient extends JComponent implements KeyListener {
 		public void run() {
 			updateLogic();
 			updateRendering();
+			correction--;
+			if (correction <= 0) {
+				correction = 30;
+				if (selected != null) {
+					new MessageSender("MA " + selected.getId() + " " + selected.getX() + " " +selected.getY()).start();
+				}
+			}
 		}
 
 	}
 
+	
+	
 	public void updateLogic() {
+		if (shouldMoveEnemy) {
+			Rectangle2D rect = selectedEnemy.getRect();
+			Rectangle2D oldRect = new Rectangle2D.Double(rect.getX(),
+					rect.getY(), rect.getWidth(), rect.getHeight());
+			selectedEnemy.move();
+			if (selectedEnemy.wallCollision() || selectedEnemy.playerCollision(tanks)) {
+				selectedEnemy.setRect(oldRect);
+			}
+			
+		}
 		if (shouldMove) {
 			if (selected != null) {
 				Rectangle2D rect = selected.getRect();
@@ -187,7 +190,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				}
 				flagCollision();
 				
-				new MessageSender("M " + selected.getId() + " " + dirString.get(selected.getDirection())).start();
+				//new MessageSender("M " + selected.getId() + " " + dirString.get(selected.getDirection())).start();
 			}
 			repaint();
 		}
@@ -325,18 +328,22 @@ public class PlayerClient extends JComponent implements KeyListener {
 			if (e.getKeyCode() == 38) {
 				selected.setDirection(Direction.UP);
 				shouldMove = true;
+				new MessageSender("M " + selected.getId() + " " + dirString.get(selected.getDirection())).start();
 			}
 			if (e.getKeyCode() == 39) {
 				selected.setDirection(Direction.RIGHT);
 				shouldMove = true;
+				new MessageSender("M " + selected.getId() + " " + dirString.get(selected.getDirection())).start();
 			}
 			if (e.getKeyCode() == 40) {
 				selected.setDirection(Direction.DOWN);
 				shouldMove = true;
+				new MessageSender("M " + selected.getId() + " " + dirString.get(selected.getDirection())).start();
 			}
 			if (e.getKeyCode() == 37) {
 				selected.setDirection(Direction.LEFT);
 				shouldMove = true;
+				new MessageSender("M " + selected.getId() + " " + dirString.get(selected.getDirection())).start();
 			}
 			previousDirection = selected.getDirection();
 		}
@@ -360,6 +367,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 															// directional
 															// changes
 			shouldMove = false;
+			new MessageSender("S").start();
 		}
 
 	}
@@ -401,11 +409,23 @@ public class PlayerClient extends JComponent implements KeyListener {
 					//move message
 					if (input[0].equals("M")) {
 						enemyTanks.get(idVal.get(input[1])).setDirection(stringDir.get(input[2]));
-						enemyTanks.get(idVal.get(input[1])).move();
+						//enemyTanks.get(idVal.get(input[1])).move();
+						shouldMoveEnemy = true;
 						handleEnemySelection();
-						//enemyTanks.get(idVal.get(input[1])).setDirection(dir.get(input[4]));
 						enemyTanks.get(idVal.get(input[1])).setSelected(true);
+						selectedEnemy = enemyTanks.get(idVal.get(input[1]));
 
+					}
+					//accurate move
+					if (input[0].equals("MA")) {
+						if (selectedEnemy != null) {
+							selectedEnemy.setRect(new Rectangle2D.Double(Double.parseDouble(input[2]), 
+									Double.parseDouble(input[3]), Tank.size, Tank.size));
+						}
+					}
+					//stop message
+					if (input[0].equals("S")) {
+						shouldMoveEnemy = false;
 					}
 					
 					if (input[0].equals("DEAD")) {
@@ -451,6 +471,29 @@ public class PlayerClient extends JComponent implements KeyListener {
 			}
 		}
 	}
+	
+	public void setupHashMap() {
+		hm.put(38, Direction.UP);
+		hm.put(40, Direction.DOWN);
+		hm.put(37, Direction.LEFT);
+		hm.put(39, Direction.RIGHT);
+		idVal.put("Q", 0);
+		idVal.put("W", 1);
+		idVal.put("E", 2);
+		dir.put("UP", Direction.UP);
+		dir.put("DOWN", Direction.DOWN);
+		dir.put("LEFT", Direction.LEFT);
+		dir.put("RIGHT", Direction.RIGHT);
+		dirString.put( Direction.UP, "U");
+		dirString.put( Direction.DOWN, "D");
+		dirString.put( Direction.LEFT, "L");
+		dirString.put( Direction.RIGHT, "R");
+		stringDir.put("U", Direction.UP);
+		stringDir.put("D", Direction.DOWN);
+		stringDir.put("L", Direction.LEFT);
+		stringDir.put("R", Direction.RIGHT);
+	}
+
 
 	private static final long serialVersionUID = 1L;
 }

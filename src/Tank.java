@@ -22,10 +22,11 @@ public class Tank {
 	int deathTimer;
 	int spawnX;
 	int spawnY;
+	Map gameMap;
 	Color color;
 	ArrayList<Bullet> bullets;
 	
-	public Tank(String id, int team, int spawnX, int spawnY ) {
+	public Tank(String id, int team, int spawnX, int spawnY, Map gameMap ) {
 		bullets = new ArrayList<Bullet>();
 		this.spawnX = spawnX;
 		this.spawnY = spawnY;
@@ -37,9 +38,38 @@ public class Tank {
 		shootTimer = 60;
 		this.id = id;
 		this.team = team;
+		this.gameMap = gameMap;
 	}
 	
+	public Tank() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public boolean wallCollision() {
+		for (Rectangle2D wall : gameMap.getWalls()) {
+			if (rect.intersects(wall)) {
+				return true;
+			}
+		}
+		for (SpawnZone wall : gameMap.spawn) {
+			if (rect.intersects(wall.rect)
+					&& team != wall.team) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
+	public boolean playerCollision(ArrayList<Tank> tanks) {
+		for (Tank enemy : tanks) {
+			if (rect.intersects(enemy.getRect())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(color);

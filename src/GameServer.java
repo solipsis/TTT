@@ -41,7 +41,7 @@ public class GameServer extends JComponent{
 	  			@Override
 	  			public void run() {
 			  		try {
-			  			//System.out.println("starting loop");
+			  			System.out.println("Please wait for both players to connect");
 			 			while (true) {
 			 				try {
 
@@ -106,15 +106,6 @@ public class GameServer extends JComponent{
 			this.socket = socket;
 		}
 		
-		public void sendToAll(String message) throws IOException{
-			for (PlayerThread player : players){
-				if (player.getSocket() != socket){
-					out = new PrintWriter(player.getSocket().getOutputStream());
-					out.write(message);
-					out.println();
-				}
-			}
-		}
 		
 		public Socket getSocket(){
 			return socket;
@@ -132,12 +123,12 @@ public class GameServer extends JComponent{
 					
 					System.out.println("both players have connected");
 					if (x == 0) {
-						System.out.println("bluh");
+						//System.out.println("bluh");
 						in = new BufferedReader(new InputStreamReader(players.get(0).socket.getInputStream()));
 						out = new PrintWriter(players.get(1).socket.getOutputStream(), true);
 					}
 					else {
-						System.out.println("bluh bluh");
+						//System.out.println("bluh bluh");
 						in = new BufferedReader(new InputStreamReader(players.get(1).socket.getInputStream()));
 						out = new PrintWriter(players.get(0).socket.getOutputStream(), true);
 					}
