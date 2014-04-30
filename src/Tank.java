@@ -35,7 +35,7 @@ public class Tank {
 		rect = new Rectangle2D.Double(spawnX, spawnY, size, size);
 		isSelected = false;
 		hasFlag = false;
-		shootTimer = 60;
+		shootTimer = 30;
 		this.id = id;
 		this.team = team;
 		this.gameMap = gameMap;
@@ -108,7 +108,7 @@ public class Tank {
 			}
 		}
 		else {
-			shootTimer = 50;
+			shootTimer = 30;
 		}
 		
 		if (dead) {

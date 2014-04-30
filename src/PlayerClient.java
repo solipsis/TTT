@@ -138,7 +138,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	}
 
 	public void gameLoop() {
-		correction = 30;
+		correction = 20;
 		timer = new Timer();
 		timer.schedule(new UpdateLoop(), 0, 1000 / 30);
 	}
@@ -150,9 +150,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 			updateRendering();
 			correction--;
 			if (correction <= 0) {
-				correction = 30;
+				correction = 20;
 				if (selected != null) {
-					new MessageSender("MA " + selected.getId() + " " + selected.getX() + " " +selected.getY()).start();
+					new MessageSender("MA " + tanks.get(0).getX() + " " + tanks.get(0).getY() + " " + tanks.get(1).getX() + " " + tanks.get(1).getY() + " " + tanks.get(2).getX() + " " + tanks.get(2).getY()).start();
+					
 				}
 			}
 		}
@@ -418,9 +419,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 					}
 					//accurate move
 					if (input[0].equals("MA")) {
-						if (selectedEnemy != null) {
-							selectedEnemy.setRect(new Rectangle2D.Double(Double.parseDouble(input[2]), 
-									Double.parseDouble(input[3]), Tank.size, Tank.size));
+						if (enemyTanks != null && enemyTanks.size() > 0) {
+							enemyTanks.get(0).setRect(new Rectangle2D.Double(Double.parseDouble(input[1]), Double.parseDouble(input[2]), Tank.size, Tank.size));
+							enemyTanks.get(1).setRect(new Rectangle2D.Double(Double.parseDouble(input[3]), Double.parseDouble(input[4]), Tank.size, Tank.size));
+							enemyTanks.get(2).setRect(new Rectangle2D.Double(Double.parseDouble(input[5]), Double.parseDouble(input[6]), Tank.size, Tank.size));
 						}
 					}
 					//stop message
