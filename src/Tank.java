@@ -12,7 +12,7 @@ public class Tank {
 	private boolean isSelected;
 	private boolean dead;
 	private boolean hasFlag;
-	final int speed = 3;
+	final int speed = 10;
 	final static int size = 40;
 	private Direction direction;
 	private Rectangle2D rect;

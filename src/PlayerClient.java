@@ -91,20 +91,49 @@ public class PlayerClient extends JComponent implements KeyListener {
 					if (input[0].equals("MOVE")) {
 						enemyTanks.get(idVal.get(input[1])).setRect(new Rectangle2D.Double(Double.parseDouble(input[2]),
 								Double.parseDouble(input[3]), Tank.size, Tank.size));
-						handleEnemySelection(idVal.get(input[1]));
+						handleEnemySelection();
 						enemyTanks.get(idVal.get(input[1])).setDirection(dir.get(input[4]));
 						enemyTanks.get(idVal.get(input[1])).setSelected(true);
 					//	System.out.println("updated position of enemy");
 					}
 					
-					if (input[0].trim().equals("DEAD")) {
+					if (input[0].equals("DEAD")) {
 						System.out.println("die");
-						enemyTanks.get(idVal.get(input[1])).die();
+						Tank t = enemyTanks.get(idVal.get(input[1]));
+						if (t.isHasFlag()) {
+							for (Flag f : map.flags) {
+								if (f.team != t.team) {
+									f.drop();
+							}
+						}
+						t.die();
+						
+							
+						}
 						System.out.println(enemyTanks.get(idVal.get(input[1])).isDead());
 					}
 					if (input[0].equals("FLAG")) {
-						
+						for (Flag f : map.flags) {
+							if (enemyTanks.get(0).team != f.team) {
+								f.pickedUp = true;
+								enemyTanks.get(idVal.get(input[1])).setHasFlag(true);;
+							}
+						}
 					}
+					if (input[0].equals("SCORE")) {
+						for (Flag f : map.flags) {
+							if (enemyTanks.get(0).team != f.team) {
+								f.score();
+							}
+						}
+					}
+					if (input[0].equals("SELECT")) {
+						boolean inverse = !enemyTanks.get(idVal.get(input[1])).isSelected();
+						handleEnemySelection();
+						enemyTanks.get(idVal.get(input[1])).setSelected(inverse);
+					}
+					
+					
 					//System.out.println("client got input");
 					//System.out.println(input);
 					
@@ -115,15 +144,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 		}
 	}
 	
-	public void handleEnemySelection(int x) {
-		//int y = 0;
+	public void handleEnemySelection() {
 		for (Tank tank : enemyTanks) {
-			//if (y != x) {
-			tank.setSelected(false);
-			//}
-			//else {
-			//	tank.setSelected(true);
-			//}
+			tank.setSelected(false);	
 		}
 		
 	}
@@ -170,11 +193,11 @@ public class PlayerClient extends JComponent implements KeyListener {
 			tanks.add(new Tank("Q", 1, 435, 330));
 			tanks.add(new Tank("W", 1, 435, 390));
 			tanks.add(new Tank("E", 1, 435, 450));
-			enemyTanks.add(new Tank("Q", 2, 800, 600));
+			enemyTanks.add(new Tank("Q", 2, 525, 330));
 			enemyTanks.add(new Tank("W", 2, 525, 390));
 			enemyTanks.add(new Tank("E", 2, 525, 450));
 		}else{
-			tanks.add(new Tank("Q", 2, 800, 600));
+			tanks.add(new Tank("Q", 2, 525, 330));
 			tanks.add(new Tank("W", 2, 525, 390));
 			tanks.add(new Tank("E", 2, 525, 450));
 			enemyTanks.add(new Tank("Q", 1, 435, 330));
@@ -273,14 +296,20 @@ public class PlayerClient extends JComponent implements KeyListener {
 				if (selected.team == f.team) {
 					if (selected.isHasFlag()) {
 						score();
-						map.flags.get(0).score();
-						map.flags.get(1).score();
+						f.score();
+						for (Flag t : map.flags){
+							if (t.team != selected.team) {
+								t.score();
+							}
+						}
+						new MessageSender("SCORE ").start();
 					}
 				} else {
 					f.pickedUp = true;
 					selected.setHasFlag(true);
+					new MessageSender("FLAG " + selected.getId()).start();
 				}
-				new MessageSender("flag").start();
+				
 			}
 		}
 	}
@@ -365,12 +394,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 
 		if (e.getKeyCode() == 81) { // Q
 			handleSelection(0);
+			new MessageSender("SELECT " + "Q").start();
 		}
 		if (e.getKeyCode() == 87) { // W
 			handleSelection(1);
+			new MessageSender("SELECT " + "W").start();
 		}
 		if (e.getKeyCode() == 69) { // E
 			handleSelection(2);
+			new MessageSender("SELECT " + "E").start();
 		}
 
 		if (selected != null) {
