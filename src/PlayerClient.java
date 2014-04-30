@@ -51,18 +51,12 @@ public class PlayerClient extends JComponent implements KeyListener {
 		public void run(){
 			//System.out.println("message sender started");
 			try {
-				//Socket socket = new Socket(InetAddress.getLocalHost()
-				//		.getHostAddress(), PORT);
+				
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				
 				out.println(message);
-				//System.out.println("client sent message : " + message);	
-					//if (input == null) {
-					//	System.out.println("null");
-					//	return;
-					//}
-				//}
+				
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
 			}
@@ -73,16 +67,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 		
 		@Override
 		public void run(){
-			System.out.println("message Reciever started");
+			//System.out.println("message Reciever started");
 			try {
-				//Socket socket = new Socket(InetAddress.getLocalHost()
-				//		.getHostAddress(), PORT);
+			
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				
 				while(true){
 					String input = in.readLine();
-					System.out.println("client got input");
-					System.out.println(input);
+					//System.out.println("client got input");
+					//System.out.println(input);
 					
 				}
 			} catch (IOException e) {
@@ -95,14 +88,13 @@ public class PlayerClient extends JComponent implements KeyListener {
 		try {
 			socket = new Socket(InetAddress.getLocalHost().getHostAddress(), PORT);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		System.out.println("creating message reciever");
+		//System.out.println("creating message reciever");
 		new MessageReciever().start();
 		
 		
@@ -185,7 +177,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				selected.move();
 				// if there is a collision than roll back the movement
 				if (playerCollision()) {
-					System.out.println("collision detected");
+					//System.out.println("collision detected");
 					selected.setRect(oldRect);
 				}
 				if (wallCollision()) {

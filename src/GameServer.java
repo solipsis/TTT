@@ -73,12 +73,13 @@ public class GameServer extends JComponent{
 		}
 	 	
 	class PlayerThread extends Thread {
-
+		
 		private Socket socket;
 		private PrintWriter out;
 		private BufferedReader in;
 
 		public PlayerThread(Socket socket) {
+			System.out.println("new player thread");
 			this.socket = socket;
 		}
 		
