@@ -37,114 +37,17 @@ public class PlayerClient extends JComponent implements KeyListener {
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
 	HashMap<String, Direction> dir;
+	HashMap<Direction, String> dirString;
+	HashMap<String, Direction> stringDir; //faster hash map for smaller packets
 	Map map;
 	HashMap<String, Integer> idVal;
 	Socket socket;
 	private int playerId;
 	
-	//BufferedReader in;
-	//PrintWriter out;
 	
 	
 	
-	class MessageSender extends Thread {
-		String message;
-		public MessageSender(String s) {
-			//System.out.println("created message sender");
-			message = s;
-		}
-		@Override
-		public void run(){
-			//System.out.println("message sender started");
-			try {
-				
-				//BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				//System.out.println("sending");
-				out.println(message + " " + playerId);
-				
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
 	
-	class MessageReciever extends Thread {
-		
-		@Override
-		public void run(){
-			//System.out.println("message Reciever started");
-			try {
-			
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				playerId = Integer.parseInt(in.readLine());
-				
-				while(true){
-					//System.out.println("while");
-					String s = in.readLine();
-					
-					
-					String input[] = s.split(" ");
-					if (!input[0].trim().equals("MOVE")) {
-						System.out.println(input[0]);
-					}
-					//System.out.println(input[0]);
-					
-					if (input[0].equals("MOVE")) {
-						enemyTanks.get(idVal.get(input[1])).setRect(new Rectangle2D.Double(Double.parseDouble(input[2]),
-								Double.parseDouble(input[3]), Tank.size, Tank.size));
-						handleEnemySelection();
-						enemyTanks.get(idVal.get(input[1])).setDirection(dir.get(input[4]));
-						enemyTanks.get(idVal.get(input[1])).setSelected(true);
-					//	System.out.println("updated position of enemy");
-					}
-					
-					if (input[0].equals("DEAD")) {
-						System.out.println("die");
-						Tank t = enemyTanks.get(idVal.get(input[1]));
-						if (t.isHasFlag()) {
-							for (Flag f : map.flags) {
-								if (f.team != t.team) {
-									f.drop();
-							}
-						}
-						t.die();
-						
-							
-						}
-						System.out.println(enemyTanks.get(idVal.get(input[1])).isDead());
-					}
-					if (input[0].equals("FLAG")) {
-						for (Flag f : map.flags) {
-							if (enemyTanks.get(0).team != f.team) {
-								f.pickedUp = true;
-								enemyTanks.get(idVal.get(input[1])).setHasFlag(true);;
-							}
-						}
-					}
-					if (input[0].equals("SCORE")) {
-						for (Flag f : map.flags) {
-							if (enemyTanks.get(0).team != f.team) {
-								f.score();
-							}
-						}
-					}
-					if (input[0].equals("SELECT")) {
-						boolean inverse = !enemyTanks.get(idVal.get(input[1])).isSelected();
-						handleEnemySelection();
-						enemyTanks.get(idVal.get(input[1])).setSelected(inverse);
-					}
-					
-					
-					//System.out.println("client got input");
-					//System.out.println(input);
-					
-				}
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
 	
 	public void handleEnemySelection() {
 		for (Tank tank : enemyTanks) {
@@ -155,8 +58,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	public PlayerClient() {
 		try {
-			 String ip = JOptionPane.showInputDialog( null, "Enter IP address for server:" );
-
+			 //String ip = JOptionPane.showInputDialog( null, "Enter IP address for server:" );
+			String ip = "192.168.0.7";
 			socket = new Socket(ip, PORT);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -165,18 +68,17 @@ public class PlayerClient extends JComponent implements KeyListener {
 			e.printStackTrace();
 		}
 		
-		//System.out.println("creating message reciever");
+
 		new MessageReciever().start();
 		
-		
+		stringDir = new HashMap<>();
+		dirString = new HashMap<>();
 		hm = new HashMap<>();
 		idVal = new HashMap<>();
 		dir = new HashMap<>();
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
-		
-
 		addKeyListener(this);
 		setFocusable(true);
 		map = new Map();
@@ -230,6 +132,14 @@ public class PlayerClient extends JComponent implements KeyListener {
 		dir.put("DOWN", Direction.DOWN);
 		dir.put("LEFT", Direction.LEFT);
 		dir.put("RIGHT", Direction.RIGHT);
+		dirString.put( Direction.UP, "U");
+		dirString.put( Direction.DOWN, "D");
+		dirString.put( Direction.LEFT, "L");
+		dirString.put( Direction.RIGHT, "R");
+		stringDir.put("U", Direction.UP);
+		stringDir.put("D", Direction.DOWN);
+		stringDir.put("L", Direction.LEFT);
+		stringDir.put("R", Direction.RIGHT);
 	}
 
 	@Override
@@ -246,7 +156,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 
 	public void gameLoop() {
 		timer = new Timer();
-		timer.schedule(new UpdateLoop(), 0, 1000 / 60);
+		timer.schedule(new UpdateLoop(), 0, 1000 / 30);
 	}
 
 	private class UpdateLoop extends TimerTask {
@@ -269,13 +179,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 				if (playerCollision()) {
 					
 					selected.setRect(oldRect);
+					return;
 				}
 				if (wallCollision()) {
 					selected.setRect(oldRect);
+					return;
 				}
 				flagCollision();
 				
-				new MessageSender("MOVE " + selected.getId() + " " + selected.getX() + " " + selected.getY() + " " + selected.getDirection()).start();
+				new MessageSender("M " + selected.getId() + " " + dirString.get(selected.getDirection())).start();
 			}
 			repaint();
 		}
@@ -379,7 +291,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 								map.flags.get(0).drop();
 							}
 						}
-						//System.out.println("non message dead");
+						
 						new MessageSender("DEAD " + selected.getId()).start();
 						t.die();
 					}
@@ -394,7 +306,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// System.out.println(e.getKeyCode());
+
 
 		if (e.getKeyCode() == 81) { // Q
 			handleSelection(0);
@@ -454,6 +366,90 @@ public class PlayerClient extends JComponent implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+	}
+	
+	class MessageSender extends Thread {
+		String message;
+		public MessageSender(String s) {
+			message = s;
+		}
+		@Override
+		public void run(){
+			try {
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				out.println(message + " " + playerId);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
+	class MessageReciever extends Thread {
+		
+		@Override
+		public void run(){
+			try {
+				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				playerId = Integer.parseInt(in.readLine());
+				
+				while(true){
+
+					String s = in.readLine();
+			
+					String input[] = s.split(" ");
+					
+					//move message
+					if (input[0].equals("M")) {
+						enemyTanks.get(idVal.get(input[1])).setDirection(stringDir.get(input[2]));
+						enemyTanks.get(idVal.get(input[1])).move();
+						handleEnemySelection();
+						//enemyTanks.get(idVal.get(input[1])).setDirection(dir.get(input[4]));
+						enemyTanks.get(idVal.get(input[1])).setSelected(true);
+
+					}
+					
+					if (input[0].equals("DEAD")) {
+
+						Tank t = enemyTanks.get(idVal.get(input[1]));
+						if (t.isHasFlag()) {
+							for (Flag f : map.flags) {
+								if (f.team != t.team) {
+									f.drop();
+							}
+						}
+						t.die();	
+						}
+	
+					}
+					if (input[0].equals("FLAG")) {
+						for (Flag f : map.flags) {
+							if (enemyTanks.get(0).team != f.team) {
+								f.pickedUp = true;
+								enemyTanks.get(idVal.get(input[1])).setHasFlag(true);;
+							}
+						}
+					}
+					if (input[0].equals("SCORE")) {
+						for (Flag f : map.flags) {
+							if (enemyTanks.get(0).team != f.team) {
+								f.score();
+								for (Tank t : enemyTanks) {
+									t.setHasFlag(false);
+								}
+							}
+						}
+					}
+					if (input[0].equals("SELECT")) {
+						boolean inverse = !enemyTanks.get(idVal.get(input[1])).isSelected();
+						handleEnemySelection();
+						enemyTanks.get(idVal.get(input[1])).setSelected(inverse);
+					}
+
+				}
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
 
 	private static final long serialVersionUID = 1L;

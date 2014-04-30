@@ -12,7 +12,7 @@ public class Tank {
 	private boolean isSelected;
 	private boolean dead;
 	private boolean hasFlag;
-	final int speed = 3;
+	final int speed = 6;
 	final static int size = 40;
 	private Direction direction;
 	private Rectangle2D rect;
@@ -34,7 +34,7 @@ public class Tank {
 		rect = new Rectangle2D.Double(spawnX, spawnY, size, size);
 		isSelected = false;
 		hasFlag = false;
-		shootTimer = 30;
+		shootTimer = 60;
 		this.id = id;
 		this.team = team;
 	}

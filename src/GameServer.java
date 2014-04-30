@@ -55,8 +55,7 @@ public class GameServer extends JComponent{
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
-							}
-			 				//System.out.println("looping...");
+							}	
 			  			}
 			  		} finally {
 			  			try {
@@ -101,7 +100,6 @@ public class GameServer extends JComponent{
 				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				out.println(index);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -129,22 +127,17 @@ public class GameServer extends JComponent{
 		class MessageBuilder extends Thread {
 			@Override
 			public void run(){
-				System.out.println("messge builder go");
-				System.out.println(index);
+				
 				try {
-					//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					
+					System.out.println("both players have connected");
 					if (x == 0) {
 						System.out.println("bluh");
-//						in = players.get(0).getIn();
-//						out = players.get(1).getOut();
 						in = new BufferedReader(new InputStreamReader(players.get(0).socket.getInputStream()));
 						out = new PrintWriter(players.get(1).socket.getOutputStream(), true);
 					}
 					else {
-					//	out = new PrintWriter(players.get(0).getSocket().getOutputStream());
 						System.out.println("bluh bluh");
-//						in = players.get(1).getIn();
-//						out = players.get(0).getOut();
 						in = new BufferedReader(new InputStreamReader(players.get(1).socket.getInputStream()));
 						out = new PrintWriter(players.get(0).socket.getOutputStream(), true);
 					}
@@ -156,10 +149,6 @@ public class GameServer extends JComponent{
 						//System.out.println("server got input: " + input);
 						out.println(input);
 				
-						//if (input == null) {
-						//	System.out.println("null");
-						//	return;
-						//}
 					}
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
@@ -170,20 +159,6 @@ public class GameServer extends JComponent{
 		@Override
 		public void run() {
 			new MessageBuilder().start();
-
-//			try {
-//				
-//				while (true){ //need an exit condition
-//					sendToAll(messages.take());
-//				}
-//				
-//				
-//				
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
 		}
 	}
 }
