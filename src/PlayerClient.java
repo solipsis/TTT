@@ -17,6 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,6 +32,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	boolean shouldMove;
 	boolean isRunning; // used for gameloop
 	private Timer timer;
+	
 	Direction direction; // the direction to move in
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
@@ -153,7 +155,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 	
 	public PlayerClient() {
 		try {
-			socket = new Socket(InetAddress.getLocalHost().getHostAddress(), PORT);
+			 String ip = JOptionPane.showInputDialog( null, "Enter IP address for server:" );
+
+			socket = new Socket(ip, PORT);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -263,7 +267,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				selected.move();
 				// if there is a collision than roll back the movement
 				if (playerCollision()) {
-					System.out.println("collision detected");
+					
 					selected.setRect(oldRect);
 				}
 				if (wallCollision()) {
