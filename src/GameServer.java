@@ -44,7 +44,7 @@ public class GameServer extends JComponent{
 			  			//System.out.println("starting loop");
 			 			while (true) {
 			 				try {
-								players.add(new PlayerThread(listener.accept()));
+								addPlayer(new PlayerThread(listener.accept()));
 								players.get(index).start();
 								index ++;
 							} catch (IOException e) {
