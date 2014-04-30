@@ -69,15 +69,20 @@ public class PlayerClient extends JComponent implements KeyListener {
 		
 		@Override
 		public void run(){
-			//System.out.println("message Reciever started");
+			System.out.println("message Reciever started");
 			try {
 			
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				playerId = Integer.parseInt(in.readLine());
 				
 				while(true){
-					String input[] = in.readLine().split(" ");
-					if (input[0] == "MOVE" ) {
+					System.out.println("while");
+					String s = in.readLine();
+					System.out.println("gotstuff");
+					System.out.println(s);
+					String input[] = s.split(" ");
+					System.out.println(input[0]);
+					if (input[0].equals("MOVE")) {
 						enemyTanks.get(idVal.get(input[1])).setRect(new Rectangle2D.Double(Double.parseDouble(input[2]),
 								Double.parseDouble(input[3]), Tank.size, Tank.size));
 						System.out.println("updated position of enemy");
@@ -205,11 +210,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 					selected.setRect(oldRect);
 				}
 				flagCollision();
-				//System.out.println("make ms");
-				new MessageSender("move").start();
-				//out.write("fat");
-				//out.println("a");
-				//out.println(selected.getId() + " " + selected.getX() + " " + selected.getY());
+				
+				new MessageSender("MOVE " + selected.getId() + " " + selected.getX() + " " + selected.getY()).start();
 			}
 			repaint();
 		}

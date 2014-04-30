@@ -86,10 +86,14 @@ public class GameServer extends JComponent{
 		private Socket socket;
 		private PrintWriter out;
 		private BufferedReader in;
+		
+		public PrintWriter getOut() {
+			return out;
+		}
 
 		public PlayerThread(Socket socket) {
 
-			//System.out.println("new player thread");
+			
 			try {
 				out = new PrintWriter(socket.getOutputStream(), true);
 				out.println(index);
@@ -121,10 +125,11 @@ public class GameServer extends JComponent{
 				try {
 					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					if (index == 1) {
-						out = new PrintWriter(new PrintWriter(players.get(1).getSocket().getOutputStream()));
+						out = players.get(1).getOut();
 					}
 					else {
-						out = new PrintWriter(new PrintWriter(players.get(0).getSocket().getOutputStream()));
+					//	out = new PrintWriter(players.get(0).getSocket().getOutputStream());
+						out = players.get(0).getOut();
 					}
 					//out = new PrintWriter(socket.getOutputStream(), true);
 					
@@ -134,10 +139,10 @@ public class GameServer extends JComponent{
 						//System.out.println("server got input: " + input);
 						out.println(input);
 				
-						if (input == null) {
-							System.out.println("null");
-							return;
-						}
+						//if (input == null) {
+						//	System.out.println("null");
+						//	return;
+						//}
 					}
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
