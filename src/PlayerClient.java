@@ -74,7 +74,6 @@ public class PlayerClient extends JComponent implements KeyListener {
 			
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				playerId = Integer.parseInt(in.readLine());
-				System.out.println("my id is " + playerId);
 				
 				while(true){
 					String input[] = in.readLine().split(" ");
@@ -110,7 +109,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
-		initializeTanks();
+		
 
 		addKeyListener(this);
 		setFocusable(true);
@@ -121,18 +120,27 @@ public class PlayerClient extends JComponent implements KeyListener {
 		// enemyTanks = temp;
 
 		setupHashMap();
-
+		initializeTanks();
 		gameLoop();
 
 	}
 
 	public void initializeTanks() {
-		tanks.add(new Tank("Q", 1, 435, 330));
-		tanks.add(new Tank("W", 1, 435, 390));
-		tanks.add(new Tank("E", 1, 435, 450));
-		enemyTanks.add(new Tank("Q", 2, 800, 600));
-		enemyTanks.add(new Tank("W", 2, 525, 390));
-		enemyTanks.add(new Tank("E", 2, 525, 450));
+		if (playerId == 1){
+			tanks.add(new Tank("Q", 1, 435, 330));
+			tanks.add(new Tank("W", 1, 435, 390));
+			tanks.add(new Tank("E", 1, 435, 450));
+			enemyTanks.add(new Tank("Q", 2, 800, 600));
+			enemyTanks.add(new Tank("W", 2, 525, 390));
+			enemyTanks.add(new Tank("E", 2, 525, 450));
+		}else{
+			tanks.add(new Tank("Q", 2, 800, 600));
+			tanks.add(new Tank("W", 2, 525, 390));
+			tanks.add(new Tank("E", 2, 525, 450));
+			enemyTanks.add(new Tank("Q", 1, 435, 330));
+			enemyTanks.add(new Tank("W", 1, 435, 390));
+			enemyTanks.add(new Tank("E", 1, 435, 450));
+		}
 		for (Tank t : tanks) {
 			t.setColor(Color.magenta);
 		}
@@ -196,7 +204,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				}
 				flagCollision();
 				//System.out.println("make ms");
-				new MessageSender("MOVE " + playerId +" "+ selected.getId() + " " + selected.getX() + " " + selected.getY()).start();
+				new MessageSender("MOVE " + selected.getId() + " " + selected.getX() + " " + selected.getY()).start();
 				
 			}
 			repaint();
