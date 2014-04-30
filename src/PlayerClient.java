@@ -80,19 +80,27 @@ public class PlayerClient extends JComponent implements KeyListener {
 				while(true){
 					//System.out.println("while");
 					String s = in.readLine();
-					System.out.println("gotstuff");
-					System.out.println(s);
+					
+					
 					String input[] = s.split(" ");
-					System.out.println(input[0]);
+					if (!input[0].trim().equals("MOVE")) {
+						System.out.println(input[0]);
+					}
+					//System.out.println(input[0]);
+					
 					if (input[0].equals("MOVE")) {
 						enemyTanks.get(idVal.get(input[1])).setRect(new Rectangle2D.Double(Double.parseDouble(input[2]),
 								Double.parseDouble(input[3]), Tank.size, Tank.size));
 						handleEnemySelection(idVal.get(input[1]));
 						enemyTanks.get(idVal.get(input[1])).setDirection(dir.get(input[4]));
-						System.out.println("updated position of enemy");
+						enemyTanks.get(idVal.get(input[1])).setSelected(true);
+					//	System.out.println("updated position of enemy");
 					}
-					if (input[0].equals("DEAD")) {
+					
+					if (input[0].trim().equals("DEAD")) {
+						System.out.println("die");
 						enemyTanks.get(idVal.get(input[1])).die();
+						System.out.println(enemyTanks.get(idVal.get(input[1])).isDead());
 					}
 					if (input[0].equals("FLAG")) {
 						
@@ -108,14 +116,14 @@ public class PlayerClient extends JComponent implements KeyListener {
 	}
 	
 	public void handleEnemySelection(int x) {
-		int y = 0;
+		//int y = 0;
 		for (Tank tank : enemyTanks) {
-			if (y != x) {
-				tank.setSelected(false);
-			}
-			else {
-				tank.setSelected(true);
-			}
+			//if (y != x) {
+			tank.setSelected(false);
+			//}
+			//else {
+			//	tank.setSelected(true);
+			//}
 		}
 		
 	}
@@ -157,12 +165,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	}
 
 	public void initializeTanks() {
-		/*tanks.add(new Tank("Q", 1, 435, 330));
-		tanks.add(new Tank("W", 1, 435, 390));
-		tanks.add(new Tank("E", 1, 435, 450));
-		enemyTanks.add(new Tank("Q", 2, 800, 600));
-		enemyTanks.add(new Tank("W", 2, 525, 390));
-		enemyTanks.add(new Tank("E", 2, 525, 450));*/
+		
 		if (playerId == 1){
 			tanks.add(new Tank("Q", 1, 435, 330));
 			tanks.add(new Tank("W", 1, 435, 390));
@@ -343,6 +346,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 								map.flags.get(0).drop();
 							}
 						}
+						//System.out.println("non message dead");
+						new MessageSender("DEAD " + selected.getId()).start();
 						t.die();
 					}
 				}

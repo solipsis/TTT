@@ -223,6 +223,16 @@ public class Tank {
 	public String getId(){
 		return id;
 	}
+
+
+	public boolean isDead() {
+		return dead;
+	}
+
+
+	public void setDead(boolean dead) {
+		this.dead = dead;
+	}
 	
 	
 	
