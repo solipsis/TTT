@@ -35,6 +35,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
 	Map map;
+	HashMap<String, Integer> idVal;
 	Socket socket;
 	private int playerId;
 	//BufferedReader in;
@@ -76,7 +77,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 				System.out.println("my id is " + playerId);
 				
 				while(true){
-					String input = in.readLine();
+					String input[] = in.readLine().split(" ");
+					if (input[0] == "MOVE" ) {
+						
+					}
 					//System.out.println("client got input");
 					//System.out.println(input);
 					
@@ -102,6 +106,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 		
 		
 		hm = new HashMap<>();
+		idVal = new HashMap<>();
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
@@ -143,6 +148,9 @@ public class PlayerClient extends JComponent implements KeyListener {
 		hm.put(40, Direction.DOWN);
 		hm.put(37, Direction.LEFT);
 		hm.put(39, Direction.RIGHT);
+		idVal.put("Q", 0);
+		idVal.put("W", 1);
+		idVal.put("E", 2);
 	}
 
 	@Override
@@ -188,10 +196,8 @@ public class PlayerClient extends JComponent implements KeyListener {
 				}
 				flagCollision();
 				//System.out.println("make ms");
-				new MessageSender("move").start();
-				//out.write("fat");
-				//out.println("a");
-				//out.println(selected.getId() + " " + selected.getX() + " " + selected.getY());
+				new MessageSender("MOVE " + playerId +" "+ selected.getId() + " " + selected.getX() + " " + selected.getY()).start();
+				
 			}
 			repaint();
 		}

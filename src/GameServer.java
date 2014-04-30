@@ -45,8 +45,12 @@ public class GameServer extends JComponent{
 			 			while (true) {
 			 				try {
 								players.add(new PlayerThread(listener.accept()));
-								players.get(index).start();
 								index ++;
+								if (index == 2) {
+									for (PlayerThread player : players) {
+										player.start();
+									}
+								}
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -110,6 +114,12 @@ public class GameServer extends JComponent{
 			public void run(){
 				try {
 					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					if (index == 1) {
+						out = new PrintWriter(new PrintWriter(players.get(1).getSocket().getOutputStream()));
+					}
+					else {
+						out = new PrintWriter(new PrintWriter(players.get(0).getSocket().getOutputStream()));
+					}
 					out = new PrintWriter(socket.getOutputStream(), true);
 					out.println(index);
 					while(true){
