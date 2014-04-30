@@ -1,19 +1,19 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.AbstractQueue;
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
-public class GameServer {
+public class GameServer extends JComponent{
 
 	private static final int PORT = 5500;
 	 	
@@ -25,6 +25,7 @@ public class GameServer {
 	  	ServerSocket listener;
 	  	
 	 
+	  	
 	  	public GameServer() {
 	 		players = new ArrayList<PlayerThread>();
 	 		messages = new ArrayBlockingQueue<String>(MESSAGE_QUEUE_MAX);
@@ -33,15 +34,30 @@ public class GameServer {
 	 	public void listen() throws IOException {
 	 		System.out.println("starting listener");
 	  		listener = new ServerSocket(PORT);
-	  		try {
-	  			System.out.println("starting loop");
-	 			while (true) {
-	 				new PlayerThread(listener.accept()).start();
-	 				System.out.println("looping...");
+	  		new Thread(new Runnable() {
+	  			@Override
+	  			public void run() {
+			  		try {
+			  			System.out.println("starting loop");
+			 			while (true) {
+			 				try {
+								new PlayerThread(listener.accept()).start();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+			 				System.out.println("looping...");
+			  			}
+			  		} finally {
+			  			try {
+							listener.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			  		}
 	  			}
-	  		} finally {
-	  			listener.close();
-	  		}
+	  		}).start();
 	  	}
 	 
 	 	public void addPlayer(PlayerThread player) {
@@ -51,6 +67,12 @@ public class GameServer {
 	 
 	 	}
 
+	 	@Override
+		public void paintComponent(Graphics g) {
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.drawString("Server", 50, 50);
+		}
+	 	
 	class PlayerThread extends Thread {
 
 		private Socket socket;
