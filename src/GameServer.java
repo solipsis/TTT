@@ -89,11 +89,14 @@ public class GameServer extends JComponent{
 
 		public PlayerThread(Socket socket) {
 			System.out.println("new player thread");
+			try {
+				out = new PrintWriter(socket.getOutputStream(), true);
+				out.println(index);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			this.socket = socket;
-		}
-		
-		public void sendPlayerId(){
-			//send the player's id based on the threads position in the players arraylist
 		}
 		
 		public void sendToAll(String message) throws IOException{
@@ -121,8 +124,8 @@ public class GameServer extends JComponent{
 					else {
 						out = new PrintWriter(new PrintWriter(players.get(0).getSocket().getOutputStream()));
 					}
-					out = new PrintWriter(socket.getOutputStream(), true);
-					out.println(index);
+					//out = new PrintWriter(socket.getOutputStream(), true);
+					
 					while(true){
 						
 						String input = in.readLine();

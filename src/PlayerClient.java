@@ -35,7 +35,6 @@ public class PlayerClient extends JComponent implements KeyListener {
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
 	Map map;
-	HashMap<String, Integer> idVal;
 	Socket socket;
 	private int playerId;
 	//BufferedReader in;
@@ -53,12 +52,18 @@ public class PlayerClient extends JComponent implements KeyListener {
 		public void run(){
 			//System.out.println("message sender started");
 			try {
-				
+				//Socket socket = new Socket(InetAddress.getLocalHost()
+				//		.getHostAddress(), PORT);
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				
 				out.println(message);
-				
+				//System.out.println("client sent message : " + message);	
+					//if (input == null) {
+					//	System.out.println("null");
+					//	return;
+					//}
+				//}
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
 			}
@@ -69,19 +74,17 @@ public class PlayerClient extends JComponent implements KeyListener {
 		
 		@Override
 		public void run(){
-			//System.out.println("message Reciever started");
+			System.out.println("message Reciever started");
 			try {
-			
+				//Socket socket = new Socket(InetAddress.getLocalHost()
+				//		.getHostAddress(), PORT);
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				playerId = Integer.parseInt(in.readLine());
 				
 				while(true){
-					String input[] = in.readLine().split(" ");
-					if (input[0] == "MOVE" ) {
-						
-					}
-					//System.out.println("client got input");
-					//System.out.println(input);
+					String input = in.readLine();
+					System.out.println("client got input");
+					System.out.println(input);
 					
 				}
 			} catch (IOException e) {
@@ -94,18 +97,18 @@ public class PlayerClient extends JComponent implements KeyListener {
 		try {
 			socket = new Socket(InetAddress.getLocalHost().getHostAddress(), PORT);
 		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//System.out.println("creating message reciever");
+		System.out.println("creating message reciever");
 		new MessageReciever().start();
 		
 		
 		hm = new HashMap<>();
-		idVal = new HashMap<>();
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
@@ -156,9 +159,6 @@ public class PlayerClient extends JComponent implements KeyListener {
 		hm.put(40, Direction.DOWN);
 		hm.put(37, Direction.LEFT);
 		hm.put(39, Direction.RIGHT);
-		idVal.put("Q", 0);
-		idVal.put("W", 1);
-		idVal.put("E", 2);
 	}
 
 	@Override
@@ -196,7 +196,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				selected.move();
 				// if there is a collision than roll back the movement
 				if (playerCollision()) {
-					//System.out.println("collision detected");
+					System.out.println("collision detected");
 					selected.setRect(oldRect);
 				}
 				if (wallCollision()) {
@@ -204,8 +204,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 				}
 				flagCollision();
 				//System.out.println("make ms");
-				new MessageSender("MOVE " + selected.getId() + " " + selected.getX() + " " + selected.getY()).start();
-				
+				new MessageSender("move").start();
+				//out.write("fat");
+				//out.println("a");
+				//out.println(selected.getId() + " " + selected.getX() + " " + selected.getY());
 			}
 			repaint();
 		}
