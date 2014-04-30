@@ -198,7 +198,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				selected.move();
 				// if there is a collision than roll back the movement
 				if (playerCollision()) {
-					//System.out.println("collision detected");
+					System.out.println("collision detected");
 					selected.setRect(oldRect);
 				}
 				if (wallCollision()) {
@@ -206,8 +206,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 				}
 				flagCollision();
 				//System.out.println("make ms");
-				new MessageSender("MOVE " + selected.getId() + " " + selected.getX() + " " + selected.getY()).start();
-				
+				new MessageSender("move").start();
+				//out.write("fat");
+				//out.println("a");
+				//out.println(selected.getId() + " " + selected.getX() + " " + selected.getY());
 			}
 			repaint();
 		}
