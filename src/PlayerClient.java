@@ -34,10 +34,12 @@ public class PlayerClient extends JComponent implements KeyListener {
 	Direction direction; // the direction to move in
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
+	HashMap<String, Direction> dir;
 	Map map;
 	HashMap<String, Integer> idVal;
 	Socket socket;
 	private int playerId;
+	
 	//BufferedReader in;
 	//PrintWriter out;
 	
@@ -54,10 +56,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 			//System.out.println("message sender started");
 			try {
 				
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				//BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				
-				out.println(message);
+				//System.out.println("sending");
+				out.println(message + " " + playerId);
 				
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
@@ -69,14 +71,14 @@ public class PlayerClient extends JComponent implements KeyListener {
 		
 		@Override
 		public void run(){
-			System.out.println("message Reciever started");
+			//System.out.println("message Reciever started");
 			try {
 			
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				playerId = Integer.parseInt(in.readLine());
 				
 				while(true){
-					System.out.println("while");
+					//System.out.println("while");
 					String s = in.readLine();
 					System.out.println("gotstuff");
 					System.out.println(s);
@@ -85,7 +87,15 @@ public class PlayerClient extends JComponent implements KeyListener {
 					if (input[0].equals("MOVE")) {
 						enemyTanks.get(idVal.get(input[1])).setRect(new Rectangle2D.Double(Double.parseDouble(input[2]),
 								Double.parseDouble(input[3]), Tank.size, Tank.size));
+						handleEnemySelection(idVal.get(input[1]));
+						enemyTanks.get(idVal.get(input[1])).setDirection(dir.get(input[4]));
 						System.out.println("updated position of enemy");
+					}
+					if (input[0].equals("DEAD")) {
+						enemyTanks.get(idVal.get(input[1])).die();
+					}
+					if (input[0].equals("FLAG")) {
+						
 					}
 					//System.out.println("client got input");
 					//System.out.println(input);
@@ -95,6 +105,19 @@ public class PlayerClient extends JComponent implements KeyListener {
 				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+	
+	public void handleEnemySelection(int x) {
+		int y = 0;
+		for (Tank tank : enemyTanks) {
+			if (y != x) {
+				tank.setSelected(false);
+			}
+			else {
+				tank.setSelected(true);
+			}
+		}
+		
 	}
 	
 	public PlayerClient() {
@@ -113,6 +136,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 		
 		hm = new HashMap<>();
 		idVal = new HashMap<>();
+		dir = new HashMap<>();
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
 		tanks = new ArrayList<Tank>();
@@ -133,6 +157,12 @@ public class PlayerClient extends JComponent implements KeyListener {
 	}
 
 	public void initializeTanks() {
+		/*tanks.add(new Tank("Q", 1, 435, 330));
+		tanks.add(new Tank("W", 1, 435, 390));
+		tanks.add(new Tank("E", 1, 435, 450));
+		enemyTanks.add(new Tank("Q", 2, 800, 600));
+		enemyTanks.add(new Tank("W", 2, 525, 390));
+		enemyTanks.add(new Tank("E", 2, 525, 450));*/
 		if (playerId == 1){
 			tanks.add(new Tank("Q", 1, 435, 330));
 			tanks.add(new Tank("W", 1, 435, 390));
@@ -166,6 +196,10 @@ public class PlayerClient extends JComponent implements KeyListener {
 		idVal.put("Q", 0);
 		idVal.put("W", 1);
 		idVal.put("E", 2);
+		dir.put("UP", Direction.UP);
+		dir.put("DOWN", Direction.DOWN);
+		dir.put("LEFT", Direction.LEFT);
+		dir.put("RIGHT", Direction.RIGHT);
 	}
 
 	@Override
@@ -211,7 +245,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 				}
 				flagCollision();
 				
-				new MessageSender("MOVE " + selected.getId() + " " + selected.getX() + " " + selected.getY()).start();
+				new MessageSender("MOVE " + selected.getId() + " " + selected.getX() + " " + selected.getY() + " " + selected.getDirection()).start();
 			}
 			repaint();
 		}

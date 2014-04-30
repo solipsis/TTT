@@ -45,9 +45,10 @@ public class GameServer extends JComponent{
 			 			while (true) {
 			 				try {
 
-								addPlayer(new PlayerThread(listener.accept()));
+								addPlayer(new PlayerThread(listener.accept(), index));
 								index ++;
 								if (index == 2) {
+									System.out.println("starting threads");
 									for (PlayerThread player : players) {
 										player.start();
 									}
@@ -86,16 +87,18 @@ public class GameServer extends JComponent{
 		private Socket socket;
 		private PrintWriter out;
 		private BufferedReader in;
+		private int x;
 		
 		public PrintWriter getOut() {
 			return out;
 		}
 
-		public PlayerThread(Socket socket) {
-
+		public PlayerThread(Socket socket, int index) {
+			x = index;
 			
 			try {
 				out = new PrintWriter(socket.getOutputStream(), true);
+				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				out.println(index);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -119,17 +122,31 @@ public class GameServer extends JComponent{
 			return socket;
 		}
 		
+		public BufferedReader getIn(){
+			return in;
+		}
+		
 		class MessageBuilder extends Thread {
 			@Override
 			public void run(){
+				System.out.println("messge builder go");
+				System.out.println(index);
 				try {
-					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					if (index == 1) {
-						out = players.get(1).getOut();
+					//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					if (x == 0) {
+						System.out.println("bluh");
+//						in = players.get(0).getIn();
+//						out = players.get(1).getOut();
+						in = new BufferedReader(new InputStreamReader(players.get(0).socket.getInputStream()));
+						out = new PrintWriter(players.get(1).socket.getOutputStream(), true);
 					}
 					else {
 					//	out = new PrintWriter(players.get(0).getSocket().getOutputStream());
-						out = players.get(0).getOut();
+						System.out.println("bluh bluh");
+//						in = players.get(1).getIn();
+//						out = players.get(0).getOut();
+						in = new BufferedReader(new InputStreamReader(players.get(1).socket.getInputStream()));
+						out = new PrintWriter(players.get(0).socket.getOutputStream(), true);
 					}
 					//out = new PrintWriter(socket.getOutputStream(), true);
 					
