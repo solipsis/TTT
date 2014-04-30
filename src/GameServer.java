@@ -32,27 +32,26 @@ public class GameServer extends JComponent{
 	  	}
 	 
 	 	public void listen() throws IOException {
-	 		System.out.println("starting listener");
+	 		//System.out.println("starting listener");
 	  		listener = new ServerSocket(PORT);
+	  		// create a new thread to listen for new players
 	  		new Thread(new Runnable() {
 	  			@Override
 	  			public void run() {
 			  		try {
-			  			System.out.println("starting loop");
+			  			//System.out.println("starting loop");
 			 			while (true) {
 			 				try {
 								new PlayerThread(listener.accept()).start();
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-			 				System.out.println("looping...");
+			 				//System.out.println("looping...");
 			  			}
 			  		} finally {
 			  			try {
 							listener.close();
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 			  		}
@@ -106,9 +105,17 @@ public class GameServer extends JComponent{
 			public void run(){
 				try {
 					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					out = new PrintWriter(socket.getOutputStream(), true);
 					while(true){
-						messages.add(in.readLine());
-						System.out.println(in.readLine());
+						
+						String input = in.readLine();
+						//System.out.println("server got input: " + input);
+						out.println("serverMove");
+				
+						if (input == null) {
+							System.out.println("null");
+							return;
+						}
 					}
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);

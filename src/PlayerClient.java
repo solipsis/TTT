@@ -18,6 +18,7 @@ import java.util.TimerTask;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class PlayerClient extends JComponent implements KeyListener {
@@ -34,27 +35,77 @@ public class PlayerClient extends JComponent implements KeyListener {
 	Direction previousDirection;
 	HashMap<Integer, Direction> hm;
 	Map map;
-	BufferedReader in;
-	PrintWriter out;
-
+	Socket socket;
+	//BufferedReader in;
+	//PrintWriter out;
+	
+	
+	
+	class MessageSender extends Thread {
+		String message;
+		public MessageSender(String s) {
+			//System.out.println("created message sender");
+			message = s;
+		}
+		@Override
+		public void run(){
+			//System.out.println("message sender started");
+			try {
+				//Socket socket = new Socket(InetAddress.getLocalHost()
+				//		.getHostAddress(), PORT);
+				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				
+				out.println(message);
+				//System.out.println("client sent message : " + message);	
+					//if (input == null) {
+					//	System.out.println("null");
+					//	return;
+					//}
+				//}
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
+	class MessageReciever extends Thread {
+		
+		@Override
+		public void run(){
+			System.out.println("message Reciever started");
+			try {
+				//Socket socket = new Socket(InetAddress.getLocalHost()
+				//		.getHostAddress(), PORT);
+				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				
+				while(true){
+					String input = in.readLine();
+					System.out.println("client got input");
+					System.out.println(input);
+					
+				}
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "A player has disconnected!", "D/C'd yo!", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
 	public PlayerClient() {
-		// #shitstorm
-		Socket clientSocket;
 		try {
-			clientSocket = new Socket(InetAddress.getLocalHost()
-					.getHostAddress(), PORT);
-			in = new BufferedReader(new InputStreamReader(
-					clientSocket.getInputStream()));
-			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			socket = new Socket(InetAddress.getLocalHost().getHostAddress(), PORT);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			System.out.println("disconnect in player client first exception");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("disconnect in player client second exception");
 			e.printStackTrace();
 		}
+		
+		System.out.println("creating message reciever");
+		new MessageReciever().start();
+		
+		
 		hm = new HashMap<>();
 		toRemove = new ArrayList<Bullet>();
 		enemyTanks = new ArrayList<Tank>();
@@ -141,7 +192,11 @@ public class PlayerClient extends JComponent implements KeyListener {
 					selected.setRect(oldRect);
 				}
 				flagCollision();
-				out.println(selected.getId() + " " + selected.getX() + " " + selected.getY());
+				//System.out.println("make ms");
+				new MessageSender("move").start();
+				//out.write("fat");
+				//out.println("a");
+				//out.println(selected.getId() + " " + selected.getX() + " " + selected.getY());
 			}
 			repaint();
 		}
@@ -173,6 +228,7 @@ public class PlayerClient extends JComponent implements KeyListener {
 					f.pickedUp = true;
 					selected.setHasFlag(true);
 				}
+				new MessageSender("flag").start();
 			}
 		}
 	}
